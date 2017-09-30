@@ -5,12 +5,12 @@
         <h3>Add a song</h3>
         <form action="<?php echo URL; ?>songs/addsong" method="POST">
             <label>Artist</label>
-            <input type="text" name="artist" value="" required />
+            <input type="text" name="artist" value="" required/>
             <label>Track</label>
-            <input type="text" name="track" value="" required />
+            <input type="text" name="track" value="" required/>
             <label>Link</label>
-            <input type="text" name="link" value="" />
-            <input type="submit" name="submit_add_song" value="Submit" />
+            <input type="text" name="link" value=""/>
+            <input type="submit" name="submit_add_song" value="Submit"/>
         </form>
     </div>
     <!-- main content output -->
@@ -21,7 +21,9 @@
         </div>
         <h3>Amount of songs (via AJAX)</h3>
         <div>
-            <button id="javascript-ajax-button">Click here to get the amount of songs via Ajax (will be displayed in #javascript-ajax-result-box)</button>
+            <button id="javascript-ajax-button">Click here to get the amount of songs via Ajax (will be displayed in
+                #javascript-ajax-result-box)
+            </button>
             <div id="javascript-ajax-result-box"></div>
         </div>
         <h3>List of songs (data from first model)</h3>
@@ -47,8 +49,12 @@
                             <a href="<?php echo htmlspecialchars($song->link, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($song->link, ENT_QUOTES, 'UTF-8'); ?></a>
                         <?php } ?>
                     </td>
-                    <td><a href="<?php echo URL . 'songs/deletesong/' . htmlspecialchars($song->id, ENT_QUOTES, 'UTF-8'); ?>">delete</a></td>
-                    <td><a href="<?php echo URL . 'songs/editsong/' . htmlspecialchars($song->id, ENT_QUOTES, 'UTF-8'); ?>">edit</a></td>
+                    <td>
+                        <a href="<?php echo URL . 'songs/deletesong/' . htmlspecialchars($song->id, ENT_QUOTES, 'UTF-8'); ?>">delete</a>
+                    </td>
+                    <td>
+                        <a href="<?php echo URL . 'songs/editsong/' . htmlspecialchars($song->id, ENT_QUOTES, 'UTF-8'); ?>">edit</a>
+                    </td>
                 </tr>
             <?php } ?>
             </tbody>
