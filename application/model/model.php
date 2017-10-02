@@ -15,115 +15,125 @@ class Model
     }
 
     /**
-     * Get all songs from database
+     * Get all runes from database
      */
-    public function getAllSongs()
+    public function getAllRunes()
     {
-        $sql = "SELECT id, artist, track, link FROM song";
+        $sql = "SELECT
+                  runes.name,
+                  runes.img_url,
+                  runes.lvl,
+                  rune_properties.property,
+                  rune_properties.in_armour,
+                  rune_properties.in_weapon
+                FROM runes
+                  INNER JOIN runes_rune_properties ON runes_rune_properties.rune_id = runes.id
+                  JOIN rune_properties ON rune_properties.id = runes_rune_properties.property_id";
         $query = $this->db->prepare($sql);
         $query->execute();
 
-        // fetchAll() is the PDO method that gets all result rows, here in object-style because we defined this in
-        // core/controller.php! If you prefer to get an associative array as the result, then do
-        // $query->fetchAll(PDO::FETCH_ASSOC); or change core/controller.php's PDO options to
-        // $options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC ...
-        return $query->fetchAll();
+        return $query->fetch();
     }
 
-    /**
-     * Add a song to database
-     * TODO put this explanation into readme and remove it from here
-     * Please note that it's not necessary to "clean" our input in any way. With PDO all input is escaped properly
-     * automatically. We also don't use strip_tags() etc. here so we keep the input 100% original (so it's possible
-     * to save HTML and JS to the database, which is a valid use case). Data will only be cleaned when putting it out
-     * in the views (see the views for more info).
-     * @param string $artist Artist
-     * @param string $track Track
-     * @param string $link Link
-     */
-    public function addSong($artist, $track, $link)
-    {
-        $sql = "INSERT INTO song (artist, track, link) VALUES (:artist, :track, :link)";
-        $query = $this->db->prepare($sql);
-        $parameters = array(':artist' => $artist, ':track' => $track, ':link' => $link);
-
-        // useful for debugging: you can see the SQL behind above construction by using:
-        // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
-
-        $query->execute($parameters);
-    }
 
     /**
-     * Delete a song in the database
-     * Please note: this is just an example! In a real application you would not simply let everybody
-     * add/update/delete stuff!
-     * @param int $song_id Id of song
+     * gets all words and appropriate equip for each word
      */
-    public function deleteSong($song_id)
+    public function getRunesWordsAndEquip()
     {
-        $sql = "DELETE FROM song WHERE id = :song_id";
+        $sql = "SELECT
+                  words.name AS word_name,
+                  equipment.name AS equipment,
+                  equipment.sockets
+                FROM words
+                  INNER JOIN words_equipment ON words_equipment.id = words.id
+                  INNER JOIN equipment ON words_equipment.equipment_id = equipment.id";
         $query = $this->db->prepare($sql);
-        $parameters = array(':song_id' => $song_id);
 
-        // useful for debugging: you can see the SQL behind above construction by using:
-        // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
+        $query->execute();
 
-        $query->execute($parameters);
-    }
-
-    /**
-     * Get a song from database
-     */
-    public function getSong($song_id)
-    {
-        $sql = "SELECT id, artist, track, link FROM song WHERE id = :song_id LIMIT 1";
-        $query = $this->db->prepare($sql);
-        $parameters = array(':song_id' => $song_id);
-
-        // useful for debugging: you can see the SQL behind above construction by using:
-        // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
-
-        $query->execute($parameters);
-
-        // fetch() is the PDO method that get exactly one result
         return $query->fetch();
     }
 
     /**
-     * Update a song in database
-     * // TODO put this explaination into readme and remove it from here
-     * Please note that it's not necessary to "clean" our input in any way. With PDO all input is escaped properly
-     * automatically. We also don't use strip_tags() etc. here so we keep the input 100% original (so it's possible
-     * to save HTML and JS to the database, which is a valid use case). Data will only be cleaned when putting it out
-     * in the views (see the views for more info).
-     * @param string $artist Artist
-     * @param string $track Track
-     * @param string $link Link
-     * @param int $song_id Id
+     * gets all words and their properties
      */
-    public function updateSong($artist, $track, $link, $song_id)
+    public function getAllWordProperties()
     {
-        $sql = "UPDATE song SET artist = :artist, track = :track, link = :link WHERE id = :song_id";
-        $query = $this->db->prepare($sql);
-        $parameters = array(':artist' => $artist, ':track' => $track, ':link' => $link, ':song_id' => $song_id);
+        $sql = "SELECT
+                  words.id,
+                  words.name,
+                  word_properties.property
+                FROM words
+                  INNER JOIN words_word_properties ON words_word_properties.runes_word_id = words.id
+                  INNER JOIN word_properties ON word_properties.id = words_word_properties.runes_word_property_id";
 
-        // useful for debugging: you can see the SQL behind above construction by using:
-        // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
-
-        $query->execute($parameters);
-    }
-
-    /**
-     * Get simple "stats". This is just a simple demo to show
-     * how to use more than one model in a controller (see application/controller/songs.php for more)
-     */
-    public function getAmountOfSongs()
-    {
-        $sql = "SELECT COUNT(id) AS amount_of_songs FROM song";
         $query = $this->db->prepare($sql);
         $query->execute();
 
-        // fetch() is the PDO method that get exactly one result
-        return $query->fetch()->amount_of_songs;
+        return $query->fetch();
     }
+
+    /**
+     * gets runes that form a runes word and their order
+     */
+    public function getWordsRunesOrder()
+    {
+        $sql = "SELECT
+                  words.id AS wore_id,
+                  words.name AS word_name,
+                  runes.name AS rune_name,
+                  runes_order.rune_order
+                FROM words
+                  INNER JOIN runes_order ON runes_order.runes_word_id = words.id
+                  INNER JOIN runes ON runes_order.rune_id = runes.id";
+
+        $query = $this->db->prepare($sql);
+        $query->execute();
+
+        return $query->fetch();
+    }
+
+
+    /**
+     * get all classes
+     */
+    public function getClasses()
+    {
+        $sql = "SELECT
+                  classes.id,
+                  classes.name
+                FROM classes";
+
+        $query = $this->db->prepare($sql);
+        $query->execute();
+
+        return $query->fetch();
+    }
+
+    /**
+     * get runes words that affect selected class properties
+     * @param $class_id
+     */
+    public function getWordsForClass($class_id)
+    {
+        $sql = "SELECT
+                  words.id as word_id,
+                  words.name AS word_name,
+                  classes.name,
+                  word_properties.property
+                FROM words
+                  INNER JOIN words_word_properties ON words_word_properties.runes_word_id = words.id
+                  INNER JOIN word_properties ON word_properties.id = words_word_properties.runes_word_property_id
+                  INNER JOIN classes_word_properties ON classes_word_properties.runes_word_property_id = words_word_properties.id
+                  INNER JOIN classes ON classes.id = classes_word_properties.class_id
+                WHERE classes.id = :class_id";
+
+        $query = $this->db->prepare($sql);
+        $parameters = array(':class_id' => $class_id);
+        $query->execute();
+
+        return $query->fetch();
+    }
+
 }
