@@ -14,12 +14,12 @@
     <link href="<?php echo URL; ?>css/style.css" rel="stylesheet">
 </head>
 <body>
-    <!-- logo -->
-    <div class="logo">
-        Runes
-    </div>
+<!-- logo -->
+<div class="logo">
+    Runes
+</div>
 
-    <!-- navigation -->
+<!-- navigation -->
 <!--    <div class="navigation">-->
 <!--        <a href="--><?php //echo URL; ?><!--">home</a>-->
 <!--        <a href="--><?php //echo URL; ?><!--home/exampleone">subpage</a>-->

@@ -8,7 +8,7 @@ class Controller
     public $db = null;
 
     /**
-     * @var null Model
+     * @var null model
      */
     public $model = null;
 
@@ -43,8 +43,8 @@ class Controller
      */
     public function loadModel()
     {
-        require APP . 'model/model.php';
+        require APP . 'model/runesModel.php';
         // create new "model" (and pass the database connection)
-        $this->model = new Model($this->db);
+        $this->model = new RunesModel($this->db);
     }
 }
