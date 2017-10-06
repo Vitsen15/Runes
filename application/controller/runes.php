@@ -12,14 +12,11 @@ class Runes extends Controller {
     const WEAPON = 'is weapon';
     const ARMOUR = 'is armour';
 
-    public function index() {
+    function __construct($model = null) {
+        parent::__construct($model);
+
         $this->runes = $this->model->getAllRunes();
         $this->runesProperties = $this->model->getAllRunesProperties();
-
-        // load views. within the views we can echo out $runes and $amount_of_songs easily
-        require APP . 'view/_templates/header.php';
-        require APP . 'view/runes/index.php';
-        require APP . 'view/_templates/footer.php';
     }
 
     /**
@@ -98,17 +95,6 @@ class Runes extends Controller {
 
         return $result;
 
-    }
-
-    /**
-     * AJAX-ACTION: ajaxGetStats
-     * TODO documentation
-     */
-    public function ajaxGetStats() {
-        $amount_of_songs = $this->model->getAmountOfSongs();
-
-        // simply echo out something. A supersimple API would be possible by echoing JSON here
-        echo $amount_of_songs;
     }
 
 }
