@@ -12,7 +12,7 @@ class Runes extends Controller {
     const WEAPON = 'is weapon';
     const ARMOUR = 'is armour';
 
-    function __construct($model = null) {
+    function __construct(RunesModel $model = null) {
         parent::__construct($model);
 
         $this->runes = $this->model->getAllRunes();

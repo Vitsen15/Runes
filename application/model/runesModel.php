@@ -1,6 +1,6 @@
 <?php
 
-include 'model.php';
+require_once APP . 'model/model.php';
 
 class RunesModel extends Model {
     /**
@@ -40,6 +40,7 @@ class RunesModel extends Model {
      */
     public function getRunesWordsAndEquip() {
         $sql = "SELECT
+                  words.id as word_id,
                   words.name AS word_name,
                   equipment.name AS equipment,
                   equipment.sockets
@@ -76,7 +77,7 @@ class RunesModel extends Model {
      */
     public function getWordsRunesOrder() {
         $sql = "SELECT
-                  words.id AS wore_id,
+                  words.id AS word_id,
                   words.name AS word_name,
                   runes.name AS rune_name,
                   runes_order.rune_order
@@ -108,23 +109,34 @@ class RunesModel extends Model {
 
     /**
      * get runes words that affect selected class properties
-     * @param $class_id
+     * @param array $classes
+     * @param array $sockets
+     * @return
+     * @internal param $class_id
      */
-    public function getWordsForClass($class_id) {
+    public function getWordsByClassAndSockets(array $classes, array $sockets) {
+        $classesInQuery = implode(',', $classes);
+        $socketsInQuery = implode(',', $sockets);
+
         $sql = "SELECT
-                  words.id as word_id,
+                  words.id AS word_id,
                   words.name AS word_name,
-                  classes.name,
-                  word_properties.property
+                  equipment.name AS equipment,
+                  equipment.sockets,
+                  classes.name AS class_name
                 FROM words
                   INNER JOIN words_word_properties ON words_word_properties.runes_word_id = words.id
                   INNER JOIN word_properties ON word_properties.id = words_word_properties.runes_word_property_id
                   INNER JOIN classes_word_properties ON classes_word_properties.runes_word_property_id = words_word_properties.id
                   INNER JOIN classes ON classes.id = classes_word_properties.class_id
-                WHERE classes.id = :class_id";
+                  INNER JOIN words_equipment ON words_equipment.runes_word_id = words.id
+                  INNER JOIN equipment ON words_equipment.equipment_id = equipment.id
+                WHERE classes.id IN (" . $classesInQuery . ") AND equipment.sockets IN (" . $socketsInQuery . ")
+                GROUP BY word_id";
 
         $query = $this->db->prepare($sql);
-        $parameters = array(':class_id' => $class_id);
+//        $parameters = $class_id;
+//        $query->bindParam(':classes', $classes, PDO::P);
         $query->execute();
 
         return $query->fetchAll();
