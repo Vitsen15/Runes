@@ -5,6 +5,10 @@ require_once APP . 'model/runesModel.php';
 
 class WordsAjaxHandler extends Controller {
     public $wordsByClassesAndSockets;
+    public $wordsByRunes;
+    public $wordsProperties;
+    public $wordsRunes;
+    public $wordsEquip;
 
     public function ajaxHandle() {
 
@@ -13,15 +17,51 @@ class WordsAjaxHandler extends Controller {
 
         $ajaxResult = $_POST;
 
-//        var_dump($ajaxResult);
+        if (isset($ajaxResult['classes'])){
+            $classes = $ajaxResult['classes'];
+        } else $classes = null;
 
-        if (array_key_exists('classes', $ajaxResult) && array_key_exists('sockets', $ajaxResult)) {
-            $this->wordsByClassesAndSockets = $this->model->getWordsByClassAndSockets($ajaxResult['classes'], $ajaxResult['sockets']);
-            var_dump($this->wordsByClassesAndSockets);
+        if (isset($ajaxResult['sockets'])){
+            $sockets = $ajaxResult['sockets'];
+        } else $sockets = null;
+
+        if (isset($ajaxResult['runes'])){
+            $runes = $ajaxResult['runes'];
+        } else $runes = null;
+
+        $classesChecked = array_key_exists('classes', $ajaxResult);
+        $socketsChecked = array_key_exists('sockets', $ajaxResult);
+        $runesChecked = array_key_exists('runes', $ajaxResult);
+        $consistChecked = array_key_exists('contains', $ajaxResult);
+
+        if ($classesChecked && $socketsChecked) {
+            $this->wordsByClassesAndSockets = $this->model->getWordsByClassesAndSockets($classes, $sockets);
+//            var_dump($this->wordsByClassesAndSockets);//+
+        } elseif ($classesChecked && !$socketsChecked) {
+            $this->wordsByClassesAndSockets = $this->model->getWordsByClasses($classes);
+//            var_dump($this->wordsByClassesAndSockets);//+
+        } elseif ($socketsChecked && !$classesChecked){
+            $this->wordsByClassesAndSockets = $this->model->getWordsBySockets($sockets);
+//            var_dump($this->wordsByClassesAndSockets);//+
         }
+
+        if ($runesChecked && !$consistChecked) {
+            $this->wordsByRunes = $this->model->getWordsByRunes($runes);
+//            var_dump($this->wordsByRunes);//+
+        } elseif ($runesChecked && $consistChecked) {
+            $this->wordsByRunes = $this->model->getWordConsistOfRunes($runes);
+//            var_dump($this->wordsByRunes);//+
+        } else {
+            $this->wordsByRunes = $this->model->getAllWords();
+        }
+
+//        var_dump($this->model->getWordRunesByID('2'));
+
+//        var_dump($this->wordsByRunes);
+//        echo '
 //
-//        if (array_key_exists('contains', $ajaxResult)) {
-//            var_dump($ajaxResult['contains']);
-//        }
+//';
+//        var_dump($this->wordsByClassesAndSockets);
     }
+
 }

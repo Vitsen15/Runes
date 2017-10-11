@@ -9,9 +9,9 @@ $(function () {
     });
 
     function limitSelectedRunesCount() {
-        $("input[name='runes']").change(function () {
+        $("input[name='runes[]']").change(function () {
             var maxAllowed = 6;
-            var cnt = $("input[name='runes']:checked").length;
+            var cnt = $("input[name='runes[]']:checked").length;
             if (cnt > maxAllowed) {
                 $(this).prop("checked", "");
                 alert('You may select maximum ' + maxAllowed + ' runes!');
@@ -30,7 +30,7 @@ $(function () {
             data: data
         })
             .done(function (data) {
-                alert("Data Saved: " + data);
+                console.log("Data Saved: " + data);
             });
     }
 
