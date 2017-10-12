@@ -34,25 +34,6 @@ class RunesModel extends Model {
         return $query->fetchAll();
     }
 
-
-    /**
-     * gets all words and their properties
-     */
-    public function getAllWordProperties() {
-        $sql = "SELECT
-                  words.id,
-                  words.name,
-                  word_properties.property
-                FROM words
-                  INNER JOIN words_word_properties ON words_word_properties.runes_word_id = words.id
-                  INNER JOIN word_properties ON word_properties.id = words_word_properties.runes_word_property_id";
-
-        $query = $this->db->prepare($sql);
-        $query->execute();
-
-        return $query->fetchAll();
-    }
-
     /**
      * get all classes
      */
@@ -82,27 +63,18 @@ class RunesModel extends Model {
             $runesInQuery = implode(',', $runes);
         }
 
-        $sql = "SELECT
-                  words.id AS word_id,
-                  words.name AS word_name,
-                  runes.id AS rune_id,
-                  runes.name AS rune_name,
-                  runes_order.rune_order
-                FROM runes_order
-                  INNER JOIN words ON words.id = runes_order.runes_word_id
-                  INNER JOIN runes ON runes.id = runes_order.rune_id
-                WHERE words.id IN (SELECT word_runes.word_id
-                                   FROM (SELECT
-                                           words.id   AS word_id,
-                                           words.name AS word_name,
-                                           runes.id   AS rune_id,
-                                           runes.name AS rune_name,
-                                           runes_order.rune_order
-                                         FROM words
-                                           INNER JOIN runes_order ON runes_order.runes_word_id = words.id
-                                           INNER JOIN runes ON runes.id = runes_order.rune_id) AS word_runes
-                                   GROUP BY word_runes.word_id
-                                   HAVING group_concat(word_runes.rune_id ORDER BY word_runes.rune_id SEPARATOR ',') = :runesInQuery)";
+        $sql = "SELECT word_runes.word_id
+                FROM (SELECT
+                        words.id   AS word_id,
+                        words.name AS word_name,
+                        runes.id   AS rune_id,
+                        runes.name AS rune_name,
+                        runes_order.rune_order
+                      FROM words
+                        INNER JOIN runes_order ON runes_order.runes_word_id = words.id
+                        INNER JOIN runes ON runes.id = runes_order.rune_id) AS word_runes
+                GROUP BY word_runes.word_id
+                HAVING group_concat(word_runes.rune_id ORDER BY word_runes.rune_id SEPARATOR ',') = :runesInQuery";
 
         $query = $this->db->prepare($sql);
         $query->bindParam(':runesInQuery', $runesInQuery, PDO::PARAM_STR);
@@ -123,11 +95,7 @@ class RunesModel extends Model {
         $socketsInQuery = implode(',', $sockets);
 
         $sql = "SELECT
-                  words.id AS word_id,
-                  words.name AS word_name,
-                  equipment.name AS equipment,
-                  equipment.sockets,
-                  classes.name AS class_name
+                  words.id AS word_id
                 FROM words
                   INNER JOIN words_word_properties ON words_word_properties.runes_word_id = words.id
                   INNER JOIN word_properties ON word_properties.id = words_word_properties.runes_word_property_id
@@ -153,9 +121,7 @@ class RunesModel extends Model {
         $classesInQuery = implode(',', $classes);
 
         $sql = "SELECT
-                  words.id AS word_id,
-                  words.name AS word_name,
-                  classes.name AS class_name
+                  words.id AS word_id
                 FROM words
                   INNER JOIN words_word_properties ON words_word_properties.runes_word_id = words.id
                   INNER JOIN word_properties ON word_properties.id = words_word_properties.runes_word_property_id
@@ -174,10 +140,7 @@ class RunesModel extends Model {
         $socketsInQuery = implode(',', $sockets);
 
         $sql = "SELECT
-                  words.id AS word_id,
-                  words.name AS word_name,
-                  equipment.name AS equipment,
-                  equipment.sockets
+                  words.id AS word_id
                 FROM words
                   INNER JOIN words_equipment ON words_equipment.runes_word_id = words.id
                   INNER JOIN equipment ON words_equipment.equipment_id = equipment.id
@@ -198,11 +161,7 @@ class RunesModel extends Model {
         $runesInQuery = implode(',', $runes);
 
         $sql = "SELECT
-                  words.id   AS word_id,
-                  words.name AS word_name,
-                  runes.id   AS rune_id,
-                  runes.name AS rune_name,
-                  runes_order.rune_order
+                  words.id   AS word_id
                 FROM words
                   INNER JOIN runes_order ON runes_order.runes_word_id = words.id
                   INNER JOIN runes ON runes.id = runes_order.rune_id
@@ -216,11 +175,7 @@ class RunesModel extends Model {
     public function getAllWords() {
 
         $sql = "SELECT
-                  words.id   AS word_id,
-                  words.name AS word_name,
-                  runes.id   AS rune_id,
-                  runes.name AS rune_name,
-                  runes_order.rune_order
+                  words.id AS word_id
                 FROM words
                   INNER JOIN runes_order ON runes_order.runes_word_id = words.id
                   INNER JOIN runes ON runes.id = runes_order.rune_id";
@@ -230,20 +185,54 @@ class RunesModel extends Model {
         return $query->fetchAll();
     }
 
-    function getWordRunesByID($wordId) {
+    public function getWordsRunesByID($wordsId) {
+        $wordsIdInQuery = implode(',', $wordsId);
 
         $sql = "SELECT
-                  words.name AS word_name,
+                  words.id AS word_id,
                   runes.id   AS rune_id,
                   runes.name AS rune_name,
                   runes_order.rune_order
                 FROM words
                   INNER JOIN runes_order ON runes_order.runes_word_id = words.id
                   INNER JOIN runes ON runes.id = runes_order.rune_id
-                WHERE words.id = :wordId";
+                WHERE words.id IN (".$wordsIdInQuery.")";
 
         $query = $this->db->prepare($sql);
-        $query->bindParam(':wordId', $wordId, PDO::PARAM_STR);
+        $query->execute();
+        return $query->fetchAll();
+    }
+
+    public function getWordPropertiesByID(array $wordsId){
+        $wordsIdInQuery = implode(',', $wordsId);
+
+        $sql = "SELECT
+                  words.id,
+                  word_properties.property
+                FROM word_properties
+                  INNER JOIN words_word_properties ON word_properties.id = words_word_properties.runes_word_property_id
+                  INNER JOIN words ON words.id = words_word_properties.runes_word_id
+                WHERE words.id IN (".$wordsIdInQuery.")";
+
+        $query = $this->db->prepare($sql);
+        $query->execute();
+        return $query->fetchAll();
+    }
+
+    public function getWordsEquipmentByID(array $wordsId){
+        $wordsIdInQuery = implode(',', $wordsId);
+
+        $sql = "SELECT
+                  words.id AS word_id,
+                  equipment.id AS equipment_id,
+                  equipment.name AS equipment,
+                  equipment.sockets
+                FROM words
+                  INNER JOIN words_equipment ON words_equipment.runes_word_id = words.id
+                  INNER JOIN equipment ON equipment.id = words_equipment.equipment_id
+                WHERE words.id IN (".$wordsIdInQuery.")";
+
+        $query = $this->db->prepare($sql);
         $query->execute();
         return $query->fetchAll();
     }
