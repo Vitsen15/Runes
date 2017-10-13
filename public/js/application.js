@@ -85,7 +85,7 @@ $(function () {
     function appendExeption() {
         var $wordsWrapper = $('#words-wrapper');
 
-        $wordsWrapper.html('<h1>НИчего не найдено!</h1>');
+        $wordsWrapper.html('<h1>Ничего не найдено!</h1>');
     }
 
 });
