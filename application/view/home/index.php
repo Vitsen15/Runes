@@ -1,5 +1,5 @@
 <div class="container">
-    <h2>Выберите параметры что бы получить нужное рунное слово</h2>
+    <h2>Выберите параметры что бы получить нужные рунные слова(о)</h2>
     <form action="" name="runes-form">
         <fieldset name="runes">
             <legend>Выберите руны</legend>
@@ -84,29 +84,7 @@
 
         <button type="submit" onclick="sendFilterData()">Найти</button>
     </form>
-<!--    <table>-->
-<!--        <thead>-->
-<!--        <tr>-->
-<!--            <td>Название</td>-->
-<!--            <td>Предмет</td>-->
-<!--            <td>Руны</td>-->
-<!--            <td>Свойства</td>-->
-<!--        </tr>-->
-<!--        </thead>-->
-<!--        <tbody>-->
-<!--        --><?php //foreach ($this->runesWordsController->words as $words): ?>
-<!--            <tr>-->
-<!--                <td>--><?php //echo $words->word_name; ?><!--</td>-->
-<!--                <td>--><?php //echo $words->equipment; ?><!-- (Сокеты: --><?php //echo $words->sockets; ?><!--)</td>-->
-<!--                <td>Runes</td>-->
-<!--                <td>Properties</td>-->
-<!--            </tr>-->
-<!--        --><?php //endforeach; ?>
-<!--        </tbody>-->
-<!--    </table>-->
     <div id="words-wrapper">
-        <script id="words-template" type="text/x-handlebars-template">
-
-        </script>
+        
     </div>
 </div>

@@ -7,6 +7,7 @@ class WordsAjaxHandler extends Controller {
     public $wordsByClassesAndSockets;
     public $wordsByRunes;
     public $uniqueWords;
+    public $wordsNames;
     public $wordsRunes;
     public $wordsEquip;
     public $wordsProperties;
@@ -18,8 +19,6 @@ class WordsAjaxHandler extends Controller {
         $this->model = new RunesModel($this->db);
 
         $ajaxResult = $_POST;
-// TODO: search follow syntax
-//        $classes = $ajaxResult['classes']??null;
 
         if (isset($ajaxResult['classes'])) {
             $classes = $ajaxResult['classes'];
@@ -40,39 +39,28 @@ class WordsAjaxHandler extends Controller {
 
         if ($classesChecked && $socketsChecked) {
             $this->wordsByClassesAndSockets = $this->model->getWordsByClassesAndSockets($classes, $sockets);
-//            var_dump($this->wordsByClassesAndSockets);//+
         } elseif ($classesChecked && !$socketsChecked) {
             $this->wordsByClassesAndSockets = $this->model->getWordsByClasses($classes);
-//            var_dump($this->wordsByClassesAndSockets);//+
         } elseif ($socketsChecked && !$classesChecked) {
             $this->wordsByClassesAndSockets = $this->model->getWordsBySockets($sockets);
-//            var_dump($this->wordsByClassesAndSockets);//+
         }
 
         if ($runesChecked && !$consistChecked) {
             $this->wordsByRunes = $this->model->getWordsByRunes($runes);
-//            var_dump($this->wordsByRunes);//+
         } elseif ($runesChecked && $consistChecked) {
             $this->wordsByRunes = $this->model->getWordConsistOfRunes($runes);
-//            var_dump($this->wordsByRunes);//+
         }
-//        else {
-//            $this->wordsByRunes = $this->model->getAllWords();
-//            var_dump($this->wordsByRunes);//+
-//        }
 
         $this->formResponseJSON();
 
     }
 
     private function formResponseJSON() {
-        if (!$this->getFiltersData()){
+        if (!$this->getFiltersData()) {
             echo 'error';
             return;
-        } else{
-            $this->responseJSON['words'] ['words_runes'] = $this->wordsRunes;
-            $this->responseJSON['words'] ['words_equipment'] = $this->wordsEquip;
-            $this->responseJSON['words'] ['words_properties'] = $this->wordsProperties;
+        } else {
+            $this->responseJSON['words'] = $this->combineDataInJSON($this->uniqueWords);
 
             echo json_encode($this->responseJSON, JSON_UNESCAPED_UNICODE);
         }
@@ -81,6 +69,8 @@ class WordsAjaxHandler extends Controller {
     private function getFiltersData() {
         $this->uniqueWords = $this->selectUniqueWordsFromFilters($this->wordsByRunes, $this->wordsByClassesAndSockets);
         asort($this->uniqueWords);
+
+        $this->wordsNames = $this->getWordsNames($this->uniqueWords);
 
         $this->wordsProperties = $this->getWordsProperties($this->uniqueWords);
 
@@ -123,6 +113,23 @@ class WordsAjaxHandler extends Controller {
 
         return array_unique($uniqueWords);
 
+    }
+
+    private function getWordsNames(array $uniqueWords){
+        $wordsNames = $this->model->getWordsNamesByID($uniqueWords);
+        $formattedWordsNames = [];
+
+        foreach ($uniqueWords as $key => $wordId) {
+
+            foreach ($wordsNames as $name) {
+
+                if ($name->word_id == $wordId) {
+                    $formattedWordsNames[$wordId] = $name->word_name;
+                }
+            }
+        }
+
+        return $formattedWordsNames;
     }
 
     /**
@@ -196,7 +203,7 @@ class WordsAjaxHandler extends Controller {
 
                 if ($equipment->word_id == $wordId) {
                     $wordEquipment['idEquip_equip'][$equipment->equipment_id] = $equipment->equipment;
-                    $wordEquipment['idEquip_sockets'][$equipment->equipment_id] = $equipment->sockets;
+                    $wordEquipment['sockets'] = $equipment->sockets;
                 }
             }
             $formattedWordEquipment[$wordId] = $wordEquipment;
@@ -205,6 +212,21 @@ class WordsAjaxHandler extends Controller {
         }
 
         return $formattedWordEquipment;
+
+    }
+
+    private function combineDataInJSON(array $uniqueWords) {
+        $wordsArray = [];
+
+        foreach ($uniqueWords as $key => $wordId) {
+            $wordsArray[$this->wordsNames[$wordId]]['name'] = $this->wordsNames[$wordId];
+            $wordsArray[$this->wordsNames[$wordId]]['id'] = $wordId;
+            $wordsArray[$this->wordsNames[$wordId]]['properties'] = $this->wordsProperties[$wordId];
+            $wordsArray[$this->wordsNames[$wordId]]['equipment'] = $this->wordsEquip[$wordId];
+            $wordsArray[$this->wordsNames[$wordId]]['runes'] = $this->wordsRunes[$wordId];
+        }
+
+        return $wordsArray;
 
     }
 

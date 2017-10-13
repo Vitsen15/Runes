@@ -49,6 +49,24 @@ class RunesModel extends Model {
         return $query->fetchAll();
     }
 
+    public function getWordsNamesByID(array $wordsId){
+        if ($wordsId == null){
+            return false;
+        }
+
+        $wordsIdInQuery = implode(',', $wordsId);
+
+        $sql = "SELECT
+                  words.id AS word_id,
+                  words.name AS word_name
+                FROM words
+                WHERE words.id IN (".$wordsIdInQuery.")";
+
+        $query = $this->db->prepare($sql);
+        $query->execute();
+        return $query->fetchAll();
+    }
+
     /**
      * gets runes that form a runes word and their order
      * @param array|null $runes
