@@ -18,6 +18,8 @@ class WordsAjaxHandler extends Controller {
         $this->model = new RunesModel($this->db);
 
         $ajaxResult = $_POST;
+// TODO: search follow syntax
+//        $classes = $ajaxResult['classes']??null;
 
         if (isset($ajaxResult['classes'])) {
             $classes = $ajaxResult['classes'];
@@ -59,37 +61,38 @@ class WordsAjaxHandler extends Controller {
 //            var_dump($this->wordsByRunes);//+
 //        }
 
-        $this->getFiltersData();
         $this->formResponseJSON();
 
     }
 
     private function formResponseJSON() {
-        $this->responseJSON['words_runes'] = $this->wordsRunes;
-        $this->responseJSON['words_equipment'] = $this->wordsEquip;
-        $this->responseJSON['words_properties'] = $this->wordsProperties;
+        if (!$this->getFiltersData()){
+            echo 'error';
+            return;
+        } else{
+            $this->responseJSON['words'] ['words_runes'] = $this->wordsRunes;
+            $this->responseJSON['words'] ['words_equipment'] = $this->wordsEquip;
+            $this->responseJSON['words'] ['words_properties'] = $this->wordsProperties;
 
-
-
-        var_dump(json_encode($this->responseJSON, JSON_UNESCAPED_UNICODE));
+            echo json_encode($this->responseJSON, JSON_UNESCAPED_UNICODE);
+        }
     }
 
     private function getFiltersData() {
         $this->uniqueWords = $this->selectUniqueWordsFromFilters($this->wordsByRunes, $this->wordsByClassesAndSockets);
-
         asort($this->uniqueWords);
 
-//        var_dump($this->uniqueWords);
-
         $this->wordsProperties = $this->getWordsProperties($this->uniqueWords);
-//
-//        var_dump($this->wordsProperties);
 
         $this->wordsRunes = $this->getWordsRunes($this->uniqueWords);
-//        var_dump($this->wordsRunes);
 
         $this->wordsEquip = ($this->getWordsEquipment($this->uniqueWords));
-//        var_dump($this->wordsEquip);
+
+        if (!$this->uniqueWords) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 

@@ -1,3 +1,5 @@
+'use strict';
+
 $(function () {
 
     $(document).ready(function () {
@@ -30,8 +32,18 @@ $(function () {
             data: data
         })
             .done(function (data) {
-                console.log("Data Saved: " + data);
+                console.log(JSON.parse(data));
+                // appendWords(data);
             });
+    };
+
+    function appendWords(words) {
+        var $wordsWrapper = $('#words-wrapper');
+
+        var source = $('#words-template').html();
+        var template = Handlebars.compile(source);
+
+        $wordsWrapper.append({items: words});
     }
 
 });

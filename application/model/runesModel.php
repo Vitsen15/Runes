@@ -52,12 +52,12 @@ class RunesModel extends Model {
     /**
      * gets runes that form a runes word and their order
      * @param array|null $runes
-     * @return
+     * @return mixed
      */
     public function getWordConsistOfRunes(array $runes = null) {
 
         if ($runes == null) {
-            $runesInQuery = 'runes.id';
+            return false;
         } else {
             asort($runes);
             $runesInQuery = implode(',', $runes);
@@ -87,10 +87,13 @@ class RunesModel extends Model {
      * get runes words that affect selected class properties
      * @param array $classes
      * @param array $sockets
-     * @return
-     * @internal param $class_id
+     * @return mixed
      */
-    public function getWordsByClassesAndSockets(array $classes, array $sockets) {
+    public function getWordsByClassesAndSockets(array $classes = null, array $sockets = null) {
+        if ($classes == null || $sockets == null){
+            return false;
+        }
+
         $classesInQuery = implode(',', $classes);
         $socketsInQuery = implode(',', $sockets);
 
@@ -117,7 +120,11 @@ class RunesModel extends Model {
      * @param array $classes
      * @return mixed
      */
-    public function getWordsByClasses(array $classes) {
+    public function getWordsByClasses(array $classes = null) {
+        if ($classes == null){
+            return false;
+        }
+
         $classesInQuery = implode(',', $classes);
 
         $sql = "SELECT
@@ -136,7 +143,11 @@ class RunesModel extends Model {
         return $query->fetchAll();
     }
 
-    public function getWordsBySockets(array $sockets) {
+    public function getWordsBySockets(array $sockets = null) {
+        if ($sockets == null){
+            return false;
+        }
+
         $socketsInQuery = implode(',', $sockets);
 
         $sql = "SELECT
@@ -157,7 +168,11 @@ class RunesModel extends Model {
      * @param array $runes
      * @return mixed
      */
-    public function getWordsByRunes(array $runes) {
+    public function getWordsByRunes(array $runes = null) {
+        if ($runes == null){
+            return false;
+        }
+
         $runesInQuery = implode(',', $runes);
 
         $sql = "SELECT
@@ -185,7 +200,11 @@ class RunesModel extends Model {
         return $query->fetchAll();
     }
 
-    public function getWordsRunesByID($wordsId) {
+    public function getWordsRunesByID($wordsId = null) {
+        if ($wordsId == null){
+            return false;
+        }
+
         $wordsIdInQuery = implode(',', $wordsId);
 
         $sql = "SELECT
@@ -203,7 +222,11 @@ class RunesModel extends Model {
         return $query->fetchAll();
     }
 
-    public function getWordPropertiesByID(array $wordsId){
+    public function getWordPropertiesByID(array $wordsId = null){
+        if ($wordsId == null){
+            return false;
+        }
+
         $wordsIdInQuery = implode(',', $wordsId);
 
         $sql = "SELECT
@@ -219,7 +242,11 @@ class RunesModel extends Model {
         return $query->fetchAll();
     }
 
-    public function getWordsEquipmentByID(array $wordsId){
+    public function getWordsEquipmentByID(array $wordsId = null){
+        if ($wordsId == null){
+            return false;
+        }
+
         $wordsIdInQuery = implode(',', $wordsId);
 
         $sql = "SELECT

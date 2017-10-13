@@ -84,24 +84,29 @@
 
         <button type="submit" onclick="sendFilterData()">Найти</button>
     </form>
-    <table>
-        <thead>
-        <tr>
-            <td>Название</td>
-            <td>Предмет</td>
-            <td>Руны</td>
-            <td>Свойства</td>
-        </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($this->runesWordsController->words as $words): ?>
-            <tr>
-                <td><?php echo $words->word_name; ?></td>
-                <td><?php echo $words->equipment; ?> (Сокеты: <?php echo $words->sockets; ?>)</td>
-                <td>Runes</td>
-                <td>Properties</td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
+<!--    <table>-->
+<!--        <thead>-->
+<!--        <tr>-->
+<!--            <td>Название</td>-->
+<!--            <td>Предмет</td>-->
+<!--            <td>Руны</td>-->
+<!--            <td>Свойства</td>-->
+<!--        </tr>-->
+<!--        </thead>-->
+<!--        <tbody>-->
+<!--        --><?php //foreach ($this->runesWordsController->words as $words): ?>
+<!--            <tr>-->
+<!--                <td>--><?php //echo $words->word_name; ?><!--</td>-->
+<!--                <td>--><?php //echo $words->equipment; ?><!-- (Сокеты: --><?php //echo $words->sockets; ?><!--)</td>-->
+<!--                <td>Runes</td>-->
+<!--                <td>Properties</td>-->
+<!--            </tr>-->
+<!--        --><?php //endforeach; ?>
+<!--        </tbody>-->
+<!--    </table>-->
+    <div id="words-wrapper">
+        <script id="words-template" type="text/x-handlebars-template">
+
+        </script>
+    </div>
 </div>
