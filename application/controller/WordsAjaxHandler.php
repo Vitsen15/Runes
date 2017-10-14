@@ -55,6 +55,9 @@ class WordsAjaxHandler extends Controller {
 
     }
 
+    /**
+     *this method creates JSON as result of all filters work and sent it to client
+     */
     private function formResponseJSON() {
         if (!$this->getFiltersData()) {
             echo 'error';
@@ -66,6 +69,10 @@ class WordsAjaxHandler extends Controller {
         }
     }
 
+    /**
+     * tries to get filters data
+     * @return bool
+     */
     private function getFiltersData() {
         $this->uniqueWords = $this->selectUniqueWordsFromFilters($this->wordsByRunes, $this->wordsByClassesAndSockets);
         asort($this->uniqueWords);
@@ -112,9 +119,12 @@ class WordsAjaxHandler extends Controller {
         $uniqueWords = array_merge($runesFilterValues, $classesAndSocketsFiltersValues);
 
         return array_unique($uniqueWords);
-
     }
 
+    /**
+     * @param array $uniqueWords filtered word's id
+     * @return array of words names
+     */
     private function getWordsNames(array $uniqueWords){
         $wordsNames = $this->model->getWordsNamesByID($uniqueWords);
         $formattedWordsNames = [];
@@ -153,8 +163,8 @@ class WordsAjaxHandler extends Controller {
 
             $wordProperties = null;
         }
-        return $formattedWordsProperties;
 
+        return $formattedWordsProperties;
     }
 
     /**
@@ -183,7 +193,6 @@ class WordsAjaxHandler extends Controller {
         }
 
         return $formattedWordsRunes;
-
     }
 
     /**
@@ -212,9 +221,13 @@ class WordsAjaxHandler extends Controller {
         }
 
         return $formattedWordEquipment;
-
     }
 
+    /**
+     * this method combines all data of words in one array to convert it to JSON
+     * @param array $uniqueWords - filtered word's id
+     * @return array of words and their properties, runes and equipment
+     */
     private function combineDataInJSON(array $uniqueWords) {
         $wordsArray = [];
 
@@ -227,7 +240,6 @@ class WordsAjaxHandler extends Controller {
         }
 
         return $wordsArray;
-
     }
 
 }

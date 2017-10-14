@@ -92,9 +92,7 @@ class Runes extends Controller {
                 $result .= $this->runesProperties[$i]->property;
             }
         }
-
         return $result;
-
     }
 
 }
