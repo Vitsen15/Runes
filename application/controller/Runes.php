@@ -1,6 +1,5 @@
 <?php
 
-
 class Runes extends Controller {
 
     private $runes;
