@@ -33,4 +33,10 @@ class Controller {
         // create new "model" (and pass the database connection)
         $this->model = $model;
     }
+
+    public function console_log($data) {
+        echo '<script>';
+        echo 'console.log(' . json_encode($data) . ')';
+        echo '</script>';
+    }
 }

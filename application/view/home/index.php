@@ -15,36 +15,43 @@
                 </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($this->runesController->runes as $rune): ?>
-                    <?php $nextRune = next($this->runesController->runes); ?>
+                <?php foreach ($this->runesController->runesWithProperties as $rune): ?>
                     <tr>
-                        <?php if (isset($nextRune->name) && $rune->name == $nextRune->name): ?>
-                            <?php continue; ?>
-                        <?php else:; ?>
+                        <td><input type="checkbox" value="<?php echo $rune->id; ?>" name="runes[]"></td>
 
-                            <td><input type="checkbox" value="<?php echo $rune->id; ?>" name="runes[]"></td>
-                            <td>
-                                <label for="<?php echo $rune->id; ?>">
-                                    <img src="<?php echo $rune->img_url; ?>" alt="<?php echo $rune->name; ?>">
-                                </label>
-                            </td>
-                            <td>
-                                <label for="<?php echo $rune->id; ?>">
-                                    <?php echo $rune->name; ?>
-                                </label>
-                            </td>
-                            <td><?php echo $rune->lvl; ?></td>
+                        <td>
+                            <img src="<?php echo $rune->img_url; ?>" alt="<?php echo $rune->name; ?>">
+                        </td>
 
+                        <td>
+                            <?php echo $rune->name; ?>
+                        </td>
 
-                            <td>
-                                <?php echo $this->runesController->getRuneProperty($rune, Runes::WEAPON); ?>
-                            </td>
+                        <td><?php echo $rune->lvl; ?></td>
+                        <td>
+                            <?php foreach ($rune->properties->in_weapon as $key => $weaponProp): ?>
+                                <?php if (count($rune->properties->in_weapon) - 1 == $key): ?>
+                                    <?php echo $weaponProp; ?>
+                                    <?php break; ?>
+                                <?php else: ?>
+                                    <?php echo $weaponProp; ?>
+                                    <?php echo ', '; ?>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </td>
 
-                            <td>
-                                <?php echo $this->runesController->getRuneProperty($rune, Runes::ARMOUR); ?>
-                            </td>
+                        <td>
+                            <?php foreach ($rune->properties->in_armour as $key => $armourProp): ?>
+                                <?php if (count($rune->properties->in_armour) - 1 == $key): ?>
+                                    <?php echo $armourProp; ?>
+                                    <?php break; ?>
+                                <?php else: ?>
+                                    <?php echo $armourProp; ?>
+                                    <?php echo ', '; ?>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </td>
 
-                        <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -85,6 +92,6 @@
         <button type="submit" onclick="sendFilterData()">Найти</button>
     </form>
     <div id="words-wrapper">
-        
+
     </div>
 </div>

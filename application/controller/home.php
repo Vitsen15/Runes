@@ -4,7 +4,6 @@ class Home extends Controller {
 
     public $runesController;
     public $classesController;
-    public $runesWordsController;
 
     /**
      * PAGE: index
@@ -23,7 +22,6 @@ class Home extends Controller {
 
         $this->runesController = new Runes($this->model);
         $this->classesController = new Classes($this->model);
-        $this->runesWordsController = new RunesWords($this->model);
 
         // load views
         require APP . 'view/_templates/header.php';

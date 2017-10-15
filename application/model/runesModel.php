@@ -19,6 +19,9 @@ class RunesModel extends Model {
         return $query->fetchAll();
     }
 
+    /**
+     * @return mixed
+     */
     public function getAllRunesProperties() {
         $sql = "SELECT
                   runes.id AS rune_id,
@@ -49,8 +52,8 @@ class RunesModel extends Model {
         return $query->fetchAll();
     }
 
-    public function getWordsNamesByID(array $wordsId){
-        if ($wordsId == null){
+    public function getWordsNamesByID(array $wordsId) {
+        if ($wordsId == null) {
             return false;
         }
 
@@ -60,7 +63,7 @@ class RunesModel extends Model {
                   words.id AS word_id,
                   words.name AS word_name
                 FROM words
-                WHERE words.id IN (".$wordsIdInQuery.")";
+                WHERE words.id IN (" . $wordsIdInQuery . ")";
 
         $query = $this->db->prepare($sql);
         $query->execute();
@@ -108,7 +111,7 @@ class RunesModel extends Model {
      * @return mixed
      */
     public function getWordsByClassesAndSockets(array $classes = null, array $sockets = null) {
-        if ($classes == null || $sockets == null){
+        if ($classes == null || $sockets == null) {
             return false;
         }
 
@@ -139,7 +142,7 @@ class RunesModel extends Model {
      * @return mixed
      */
     public function getWordsByClasses(array $classes = null) {
-        if ($classes == null){
+        if ($classes == null) {
             return false;
         }
 
@@ -162,7 +165,7 @@ class RunesModel extends Model {
     }
 
     public function getWordsBySockets(array $sockets = null) {
-        if ($sockets == null){
+        if ($sockets == null) {
             return false;
         }
 
@@ -187,7 +190,7 @@ class RunesModel extends Model {
      * @return mixed
      */
     public function getWordsByRunes(array $runes = null) {
-        if ($runes == null){
+        if ($runes == null) {
             return false;
         }
 
@@ -219,7 +222,7 @@ class RunesModel extends Model {
     }
 
     public function getWordsRunesByID($wordsId = null) {
-        if ($wordsId == null){
+        if ($wordsId == null) {
             return false;
         }
 
@@ -233,15 +236,15 @@ class RunesModel extends Model {
                 FROM words
                   INNER JOIN runes_order ON runes_order.runes_word_id = words.id
                   INNER JOIN runes ON runes.id = runes_order.rune_id
-                WHERE words.id IN (".$wordsIdInQuery.")";
+                WHERE words.id IN (" . $wordsIdInQuery . ")";
 
         $query = $this->db->prepare($sql);
         $query->execute();
         return $query->fetchAll();
     }
 
-    public function getWordPropertiesByID(array $wordsId = null){
-        if ($wordsId == null){
+    public function getWordPropertiesByID(array $wordsId = null) {
+        if ($wordsId == null) {
             return false;
         }
 
@@ -253,15 +256,15 @@ class RunesModel extends Model {
                 FROM word_properties
                   INNER JOIN words_word_properties ON word_properties.id = words_word_properties.runes_word_property_id
                   INNER JOIN words ON words.id = words_word_properties.runes_word_id
-                WHERE words.id IN (".$wordsIdInQuery.")";
+                WHERE words.id IN (" . $wordsIdInQuery . ")";
 
         $query = $this->db->prepare($sql);
         $query->execute();
         return $query->fetchAll();
     }
 
-    public function getWordsEquipmentByID(array $wordsId = null){
-        if ($wordsId == null){
+    public function getWordsEquipmentByID(array $wordsId = null) {
+        if ($wordsId == null) {
             return false;
         }
 
@@ -275,7 +278,7 @@ class RunesModel extends Model {
                 FROM words
                   INNER JOIN words_equipment ON words_equipment.runes_word_id = words.id
                   INNER JOIN equipment ON equipment.id = words_equipment.equipment_id
-                WHERE words.id IN (".$wordsIdInQuery.")";
+                WHERE words.id IN (" . $wordsIdInQuery . ")";
 
         $query = $this->db->prepare($sql);
         $query->execute();
