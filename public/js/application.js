@@ -3,24 +3,13 @@
 $(function () {
 
     $(document).ready(function () {
-        limitSelectedRunesCount();
-
-        $('form[name=runes-form]').submit(function (e) {
-            e.preventDefault();
-        });
-
+        formSubmitPreventDefault();
         changeFiltersByCotsistOfFilter();
-
     });
 
-    function limitSelectedRunesCount() {
-        $("input[name='runes[]']").change(function () {
-            var maxAllowed = 6;
-            var cnt = $("input[name='runes[]']:checked").length;
-            if (cnt > maxAllowed) {
-                $(this).prop("checked", "");
-                alert('You may select maximum ' + maxAllowed + ' runes!');
-            }
+    function formSubmitPreventDefault() {
+        $('form[name=runes-form]').submit(function (e) {
+            e.preventDefault();
         });
     }
 
@@ -52,9 +41,7 @@ $(function () {
     }
 
     window.sendFilterData = function sendFiltersData() {
-
         var data = $('form[name=runes-form]').serialize();
-        // alert(data);
 
         $.ajax({
             method: "POST",

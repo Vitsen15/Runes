@@ -1,7 +1,6 @@
 <?php
 
 class Runes extends Controller {
-
     private $runes;
     private $runesProperties;
     public $runesWithProperties;
