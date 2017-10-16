@@ -56,8 +56,6 @@
                 <?php endforeach; ?>
                 </tbody>
             </table>
-            <label for="contains">Состоит из</label>
-            <input type="checkbox" id="contains" name="contains" value="true">
         </fieldset>
 
         <fieldset name="sockets">
@@ -90,6 +88,7 @@
         </fieldset>
 
         <button type="submit" onclick="sendFilterData()">Найти</button>
+        <button id="reset-filters">Сбросить фильтры</button>
     </form>
     <div id="words-wrapper">
 

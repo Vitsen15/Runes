@@ -14,7 +14,6 @@ class WordsAjaxHandler extends Controller {
     public $responseJSON;
 
     public function ajaxHandle() {
-
         $this->db = new DBConnection();
         $this->model = new RunesModel($this->db);
 
@@ -35,7 +34,6 @@ class WordsAjaxHandler extends Controller {
         $classesChecked = array_key_exists('classes', $ajaxResult);
         $socketsChecked = array_key_exists('sockets', $ajaxResult);
         $runesChecked = array_key_exists('runes', $ajaxResult);
-        $consistChecked = array_key_exists('contains', $ajaxResult);
 
         if ($classesChecked && $socketsChecked) {
             $this->wordsByClassesAndSockets = $this->model->getWordsByClassesAndSockets($classes, $sockets);
@@ -45,14 +43,11 @@ class WordsAjaxHandler extends Controller {
             $this->wordsByClassesAndSockets = $this->model->getWordsBySockets($sockets);
         }
 
-        if ($runesChecked && !$consistChecked) {
-            $this->wordsByRunes = $this->model->getWordsByRunes($runes);
-        } elseif ($runesChecked && $consistChecked) {
+        if ($runesChecked) {
             $this->wordsByRunes = $this->model->getWordConsistOfRunes($runes);
         }
 
         $this->formResponseJSON();
-
     }
 
     /**
@@ -125,7 +120,7 @@ class WordsAjaxHandler extends Controller {
      * @param array $uniqueWords filtered word's id
      * @return array of words names
      */
-    private function getWordsNames(array $uniqueWords){
+    private function getWordsNames(array $uniqueWords) {
         $wordsNames = $this->model->getWordsNamesByID($uniqueWords);
         $formattedWordsNames = [];
 

@@ -13,6 +13,7 @@ class Home extends Controller {
         //load model and db connection
         require_once APP . 'core/DBConnection.php';
         require_once APP . 'model/runesModel.php';
+        //load controllers
         require_once APP . 'controller/Runes.php';
         require_once APP . 'controller/Classes.php';
         require_once APP . 'controller/RunesWords.php';

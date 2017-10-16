@@ -4,7 +4,7 @@ $(function () {
 
     $(document).ready(function () {
         formSubmitPreventDefault();
-        changeFiltersByCotsistOfFilter();
+        resetFilters();
     });
 
     function formSubmitPreventDefault() {
@@ -13,31 +13,15 @@ $(function () {
         });
     }
 
-    function changeFiltersByCotsistOfFilter() {
-        var $contains = $('#contains');
+    function resetFilters() {
+        var $resetFilters = $('#reset-filters');
+        var $filters = $("input[name='runes[]'], [name='sockets[]'], [name='classes[]']");
 
-        $contains.change(function () {
-            if ($contains.prop('checked')) {
-                changeSocketsAndClassesInputs(false);
-            } else {
-                changeSocketsAndClassesInputs(true);
-            }
+        console.log($filters);
+
+        $resetFilters.click(function () {
+            $filters.prop('checked', false);
         });
-    }
-
-    function changeSocketsAndClassesInputs(disabled) {
-        var $sockets = $("input[name='sockets[]']");
-        var $classes = $("input[name='classes[]']");
-
-        if (disabled === false) {
-            $sockets.prop('disabled', true);
-            $classes.prop('disabled', true);
-        } else {
-            $sockets.prop('disabled', false);
-            $classes.prop('disabled', false);
-        }
-
-
     }
 
     window.sendFilterData = function sendFiltersData() {
@@ -50,26 +34,22 @@ $(function () {
         })
             .done(function (data) {
                 if (data === 'error') {
-                    appendExeption();
+                    appendException();
                     return;
                 }
-                // console.log();
                 appendWords(JSON.parse(data));
             });
     };
 
     function appendWords(words) {
         var $wordsWrapper = $('#words-wrapper');
-
-        console.log(words);
-
         var source = $('#template').html();
         var template = Handlebars.compile(source);
 
         $wordsWrapper.html(template({items: words}));
     }
 
-    function appendExeption() {
+    function appendException() {
         var $wordsWrapper = $('#words-wrapper');
 
         $wordsWrapper.html('<h1>Ничего не найдено!</h1>');

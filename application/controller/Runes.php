@@ -29,9 +29,7 @@ class Runes extends Controller {
             $runeObj->{'lvl'} = $rune->lvl;
 
             foreach ($this->runesProperties as $property) {
-
                 if ($rune->id === $property->rune_id){
-
                     if($property->in_weapon) {
                         $props['in_weapon'][] = $property->property;
                     }
