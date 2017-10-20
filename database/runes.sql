@@ -94,7 +94,7 @@ CREATE TABLE `equipment` (
 -- Дамп данных таблицы `equipment`
 --
 
-INSERT INTO `equipment` (`id`, `name`, `sockets`) VALUES
+INSERT INTO `equipment` (type_id, type_name, parent_id) VALUES
 (9, 'Дубина', 3),
 (10, 'Молот', 3),
 (11, 'Булава', 3),
@@ -689,7 +689,7 @@ ALTER TABLE `classes_word_properties`
 -- Индексы таблицы `equipment`
 --
 ALTER TABLE `equipment`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (type_id);
 
 --
 -- Индексы таблицы `runes`
@@ -757,7 +757,7 @@ ALTER TABLE `classes_word_properties`
 -- AUTO_INCREMENT для таблицы `equipment`
 --
 ALTER TABLE `equipment`
-  MODIFY `id` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY type_id int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 --
 -- AUTO_INCREMENT для таблицы `runes`
 --

@@ -272,17 +272,38 @@ class RunesModel extends Model {
 
         $sql = "SELECT
                   words.id AS word_id,
-                  equipment.id AS equipment_id,
-                  equipment.name AS equipment,
-                  equipment.sockets
+                  equipment.type_id AS equipment_id,
+                  equipment.type_name AS equipment
                 FROM words
                   INNER JOIN words_equipment ON words_equipment.runes_word_id = words.id
-                  INNER JOIN equipment ON equipment.id = words_equipment.equipment_id
+                  INNER JOIN equipment ON equipment.type_id = words_equipment.equipment_id
                 WHERE words.id IN (" . $wordsIdInQuery . ")";
 
         $query = $this->db->prepare($sql);
         $query->execute();
         return $query->fetchAll();
+    }
+
+    public function getFilteredWordsByRunes($runes = null) {
+        if ($runes == null) {
+            return false;
+        } else {
+            asort($runes);
+            $runesInQuery = implode(',', $runes);
+        }
+
+        $wordsByRunes = "CALL selectWordsByRunes(:id, @Result)";
+
+        $query = $this->db->prepare($wordsByRunes);
+
+        $query->bindParam(':id', $runesInQuery, PDO::PARAM_STR);
+        $query->execute();
+        $query->closeCursor();
+
+        $resultQuery = $this->db->query("SELECT @Result as words")->fetch(PDO::FETCH_ASSOC);
+
+
+        return $resultQuery;
     }
 
 }

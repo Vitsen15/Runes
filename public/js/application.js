@@ -17,8 +17,6 @@ $(function () {
         var $resetFilters = $('#reset-filters');
         var $filters = $("input[name='runes[]'], [name='sockets[]'], [name='classes[]']");
 
-        console.log($filters);
-
         $resetFilters.click(function () {
             $filters.prop('checked', false);
         });
@@ -37,7 +35,8 @@ $(function () {
                     appendException();
                     return;
                 }
-                appendWords(JSON.parse(data));
+                console.log(data);
+                appendWords(data);
             });
     };
 

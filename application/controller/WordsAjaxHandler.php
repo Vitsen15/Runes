@@ -35,23 +35,30 @@ class WordsAjaxHandler extends Controller {
         $socketsChecked = array_key_exists('sockets', $ajaxResult);
         $runesChecked = array_key_exists('runes', $ajaxResult);
 
-        if ($classesChecked && $socketsChecked) {
-            $this->wordsByClassesAndSockets = $this->model->getWordsByClassesAndSockets($classes, $sockets);
-        } elseif ($classesChecked && !$socketsChecked) {
-            $this->wordsByClassesAndSockets = $this->model->getWordsByClasses($classes);
-        } elseif ($socketsChecked && !$classesChecked) {
-            $this->wordsByClassesAndSockets = $this->model->getWordsBySockets($sockets);
-        }
+//        if ($classesChecked && $socketsChecked) {
+//            $this->wordsByClassesAndSockets = $this->model->getWordsByClassesAndSockets($classes, $sockets);
+//        } else
 
-        if ($runesChecked) {
-            $this->wordsByRunes = $this->model->getWordConsistOfRunes($runes);
-        }
+        $this->wordsByRunes = $this->model->getFilteredWordsByRunes($runes);
 
-        $this->formResponseJSON();
+        var_dump($this->wordsByRunes);
+
+//        if ($classesChecked) {
+//            $this->wordsByClassesAndSockets = $this->model->getWordsByClasses($classes);
+//        } elseif ($socketsChecked) {
+//            $this->wordsByClassesAndSockets = $this->model->getWordsBySockets($sockets);
+//        }
+//
+//        if ($runesChecked) {
+//            $this->wordsByRunes = $this->model->getWordConsistOfRunes($runes);
+//        }
+//
+//        $this->formResponseJSON();
     }
 
     /**
      *this method creates JSON as result of all filters work and sent it to client
+     *
      */
     private function formResponseJSON() {
         if (!$this->getFiltersData()) {
@@ -154,8 +161,8 @@ class WordsAjaxHandler extends Controller {
                     $wordProperties[] = $property->property;
                 }
             }
-            $formattedWordsProperties[$wordId] = $wordProperties;
 
+            $formattedWordsProperties[$wordId] = $wordProperties;
             $wordProperties = null;
         }
 
@@ -182,8 +189,8 @@ class WordsAjaxHandler extends Controller {
                     $wordRunes['id_name'][$rune->rune_id] = $rune->rune_name;
                 }
             }
-            $formattedWordsRunes[$wordId] = $wordRunes;
 
+            $formattedWordsRunes[$wordId] = $wordRunes;
             $wordRunes = null;
         }
 
@@ -207,11 +214,10 @@ class WordsAjaxHandler extends Controller {
 
                 if ($equipment->word_id == $wordId) {
                     $wordEquipment['idEquip_equip'][$equipment->equipment_id] = $equipment->equipment;
-                    $wordEquipment['sockets'] = $equipment->sockets;
                 }
             }
-            $formattedWordEquipment[$wordId] = $wordEquipment;
 
+            $formattedWordEquipment[$wordId] = $wordEquipment;
             $wordEquipment = null;
         }
 
