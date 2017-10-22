@@ -4,6 +4,7 @@ $(function () {
 
     $(document).ready(function () {
         formSubmitPreventDefault();
+        levelFiltersValidation();
         resetFilters();
     });
 
@@ -22,6 +23,45 @@ $(function () {
         });
     }
 
+    function levelFiltersValidation() {
+        var $minLevelInput = $("input[type='range'][name='minLevel']");
+        var $maxLevelInput = $("input[type='range'][name='maxLevel']");
+
+        var $minLevelOutput = $("output[name='minLevelOutput']");
+        var $maxLevelOutput = $("output[name='maxLevelOutput']");
+
+        setMinLevelLimiter();
+        setMaxLevelLimiter();
+
+        function setMinLevelLimiter() {
+            var previousMinLevel = $minLevelOutput.val();
+
+            $minLevelInput.click(function () {
+                previousMinLevel = this.value;
+            }).change(function () {
+                if (this.value > $maxLevelInput.val()) {
+                    $(this).val(previousMinLevel);
+                    $minLevelOutput.val(this.value);
+
+                }
+            });
+        }
+
+        function setMaxLevelLimiter() {
+            var previousMaxLevel = $maxLevelInput.val();
+
+            $maxLevelInput.click(function () {
+                previousMaxLevel = this.value;
+            }).change(function () {
+                if (this.value < $minLevelInput.val()) {
+                    $(this).val(previousMaxLevel);
+                    $maxLevelOutput.val(this.value);
+                }
+            });
+        }
+
+    }
+
     window.sendFilterData = function sendFiltersData() {
         var data = $('form[name=runes-form]').serialize();
 
@@ -32,15 +72,15 @@ $(function () {
         })
             .done(function (data) {
                 if (data === 'error') {
-                    appendException();
+                    appendNotFoundException();
                     return;
                 }
                 console.log(data);
-                appendWords(data);
+                appendFoundWords(data);
             });
     };
 
-    function appendWords(words) {
+    function appendFoundWords(words) {
         var $wordsWrapper = $('#words-wrapper');
         var source = $('#template').html();
         var template = Handlebars.compile(source);
@@ -48,7 +88,7 @@ $(function () {
         $wordsWrapper.html(template({items: words}));
     }
 
-    function appendException() {
+    function appendNotFoundException() {
         var $wordsWrapper = $('#words-wrapper');
 
         $wordsWrapper.html('<h1>Ничего не найдено!</h1>');

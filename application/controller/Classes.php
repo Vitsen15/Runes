@@ -1,7 +1,6 @@
 <?php
 
 class Classes extends Controller {
-    public $model;
     public $classes;
 
     function __construct(RunesModel $model = null) {

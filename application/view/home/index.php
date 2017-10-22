@@ -87,6 +87,38 @@
             <?php endforeach; ?>
         </fieldset>
 
+        <fieldset>
+            <legend>Выберите уровень</legend>
+            <div>
+                <h2>Минимальный уровень</h2>
+                <input type="range" name="minLevel" list="min-levels-list"
+                       min="<?php echo $this->levelsController->levels[0]; ?>"
+                       max="<?php echo end($this->levelsController->levels); ?>"
+                       value="<?php echo $this->levelsController->levels[0]; ?>"
+                       oninput="minLevelOutput.value = minLevel.value">
+                <output name="minLevelOutput"><?php echo $this->levelsController->levels[0]; ?></output>
+                <datalist id="min-levels-list">
+                    <?php foreach ($this->levelsController->levels as $level): ?>
+                    <option value="<?php echo $level; ?>">
+                        <?php endforeach; ?>
+                </datalist>
+            </div>
+            <div>
+                <h2>Максимальный уровень</h2>
+                <input type="range" name="maxLevel" list="min-levels-list"
+                       min="<?php echo $this->levelsController->levels[0]; ?>"
+                       max="<?php echo end($this->levelsController->levels); ?>"
+                       value="<?php echo end($this->levelsController->levels); ?>"
+                       oninput="maxLevelOutput.value = maxLevel.value">
+                <output name="maxLevelOutput"><?php echo end($this->levelsController->levels); ?></output>
+                <datalist id="min-levels-list">
+                    <?php foreach ($this->levelsController->levels as $level): ?>
+                    <option value="<?php echo $level; ?>">
+                        <?php endforeach; ?>
+                </datalist>
+            </div>
+        </fieldset>
+
         <button type="submit" onclick="sendFilterData()">Найти</button>
         <button id="reset-filters">Сбросить фильтры</button>
     </form>

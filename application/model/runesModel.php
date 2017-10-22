@@ -52,6 +52,17 @@ class RunesModel extends Model {
         return $query->fetchAll();
     }
 
+    public function getLevels(){
+        $sql = "SELECT DISTINCT runes.lvl
+                FROM runes
+                ORDER BY runes.lvl ASC";
+
+        $query = $this->db->prepare($sql);
+        $query->execute();
+
+        return $query->fetchAll();
+    }
+
     public function getWordsNamesByID(array $wordsId) {
         if ($wordsId == null) {
             return false;
@@ -167,22 +178,21 @@ class RunesModel extends Model {
     public function getWordsBySockets(array $sockets = null) {
         if ($sockets == null) {
             return false;
+        } else {
+            asort($sockets);
+            $socketsInQuery = implode(',', $sockets);
         }
 
-        $socketsInQuery = implode(',', $sockets);
+        $wordsBySockets = "CALL selectWordsBySockets(:sockets, @Result)";
 
-        $sql = "SELECT
-                  words.id AS word_id
-                FROM words
-                  INNER JOIN words_equipment ON words_equipment.runes_word_id = words.id
-                  INNER JOIN equipment ON words_equipment.equipment_id = equipment.id
-                WHERE equipment.sockets IN (" . $socketsInQuery . ")
-                GROUP BY word_id";
+        $query = $this->db->prepare($wordsBySockets);
 
-        $query = $this->db->prepare($sql);
+        $query->bindParam(':sockets', $socketsInQuery, PDO::PARAM_STR);
         $query->execute();
+        $query->closeCursor();
+        $words = $this->db->query("SELECT @Result as words")->fetch();
 
-        return $query->fetchAll();
+        return $words;
     }
 
     /**
@@ -284,7 +294,11 @@ class RunesModel extends Model {
         return $query->fetchAll();
     }
 
-    public function getFilteredWordsByRunes($runes = null) {
+    /**
+     * @param array|null $runes
+     * @return bool
+     */
+    public function getFilteredWordsByRunes(array $runes = null) {
         if ($runes == null) {
             return false;
         } else {
@@ -299,11 +313,9 @@ class RunesModel extends Model {
         $query->bindParam(':id', $runesInQuery, PDO::PARAM_STR);
         $query->execute();
         $query->closeCursor();
+        $words = $this->db->query("SELECT @Result as words")->fetch();
 
-        $resultQuery = $this->db->query("SELECT @Result as words")->fetch(PDO::FETCH_ASSOC);
-
-
-        return $resultQuery;
+        return $words;
     }
 
 }

@@ -4,123 +4,157 @@ require_once APP . 'core/DBConnection.php';
 require_once APP . 'model/runesModel.php';
 
 class WordsAjaxHandler extends Controller {
-    public $wordsByClassesAndSockets;
-    public $wordsByRunes;
-    public $uniqueWords;
-    public $wordsNames;
-    public $wordsRunes;
-    public $wordsEquip;
-    public $wordsProperties;
+    // Data from client filters
+    private $runes;
+    private $sockets;
+    private $classes;
+    private $minLevel;
+    private $maxLevel;
+
+    // Filters values
+    private $wordsByRunes;
+    private $wordsBySockets;
+    private $wordsByClasses;
+    private $wordsByLevels;
+
+    // Combined words id's by all filters
+    private $uniqueWordsID;
+
+    // Data to form response json
+    private $wordsNames;
+    private $wordsRunes;
+    private $wordsEquip;
+    private $wordsProperties;
+
     public $responseJSON;
 
     public function ajaxHandle() {
         $this->db = new DBConnection();
         $this->model = new RunesModel($this->db);
 
-        $ajaxResult = $_POST;
+        $this->getClientFiltersData();
 
-        if (isset($ajaxResult['classes'])) {
-            $classes = $ajaxResult['classes'];
-        } else $classes = null;
+        $this->getAllFiltersData();
 
-        if (isset($ajaxResult['sockets'])) {
-            $sockets = $ajaxResult['sockets'];
-        } else $sockets = null;
-
-        if (isset($ajaxResult['runes'])) {
-            $runes = $ajaxResult['runes'];
-        } else $runes = null;
-
-        $classesChecked = array_key_exists('classes', $ajaxResult);
-        $socketsChecked = array_key_exists('sockets', $ajaxResult);
-        $runesChecked = array_key_exists('runes', $ajaxResult);
-
-//        if ($classesChecked && $socketsChecked) {
-//            $this->wordsByClassesAndSockets = $this->model->getWordsByClassesAndSockets($classes, $sockets);
-//        } else
-
-        $this->wordsByRunes = $this->model->getFilteredWordsByRunes($runes);
-
-        var_dump($this->wordsByRunes);
-
-//        if ($classesChecked) {
-//            $this->wordsByClassesAndSockets = $this->model->getWordsByClasses($classes);
-//        } elseif ($socketsChecked) {
-//            $this->wordsByClassesAndSockets = $this->model->getWordsBySockets($sockets);
-//        }
-//
-//        if ($runesChecked) {
-//            $this->wordsByRunes = $this->model->getWordConsistOfRunes($runes);
-//        }
-//
-//        $this->formResponseJSON();
+        $this->formResponseJSON();
     }
 
     /**
-     *this method creates JSON as result of all filters work and sent it to client
-     *
+     * Creates JSON as result of all filters work and sent it to client
      */
     private function formResponseJSON() {
-        if (!$this->getFiltersData()) {
+        if (!$this->collectDataForResponse()) {
             echo 'error';
             return;
         } else {
-            $this->responseJSON['words'] = $this->combineDataInJSON($this->uniqueWords);
+            $this->responseJSON['words'] = $this->combineWordsData($this->uniqueWordsID);
 
             echo json_encode($this->responseJSON, JSON_UNESCAPED_UNICODE);
         }
     }
 
     /**
-     * tries to get filters data
+     * Tries to collect all data for response JSON
      * @return bool
      */
-    private function getFiltersData() {
-        $this->uniqueWords = $this->selectUniqueWordsFromFilters($this->wordsByRunes, $this->wordsByClassesAndSockets);
-        asort($this->uniqueWords);
+    private function collectDataForResponse() {
+        $this->uniqueWordsID = $this->selectUniqueWordsFromFilters();
+//        var_dump($this->uniqueWordsID);
+        asort($this->uniqueWordsID);
 
-        $this->wordsNames = $this->getWordsNames($this->uniqueWords);
+        $this->wordsNames = $this->getWordsNames($this->uniqueWordsID);
 
-        $this->wordsProperties = $this->getWordsProperties($this->uniqueWords);
+        $this->wordsProperties = $this->getWordsProperties($this->uniqueWordsID);
 
-        $this->wordsRunes = $this->getWordsRunes($this->uniqueWords);
+        $this->wordsRunes = $this->getWordsRunes($this->uniqueWordsID);
 
-        $this->wordsEquip = ($this->getWordsEquipment($this->uniqueWords));
+        $this->wordsEquip = ($this->getWordsEquipment($this->uniqueWordsID));
 
-        if (!$this->uniqueWords) {
+        if (!$this->uniqueWordsID) {
             return false;
         } else {
             return true;
         }
     }
 
+    /**
+     * Saves filters data that comes from client
+     */
+    private function getClientFiltersData() {
+        $ajaxResult = $_POST;
+
+        if (isset($ajaxResult['runes'])) {
+            $this->runes = $ajaxResult['runes'];
+//            var_dump($this->runes);
+        } else $this->runes = null;
+
+        if (isset($ajaxResult['sockets'])) {
+            $this->sockets = $ajaxResult['sockets'];
+//            var_dump($this->sockets);
+        } else $this->sockets = null;
+
+        if (isset($ajaxResult['classes'])) {
+            $this->classes = $ajaxResult['classes'];
+//            var_dump($this->classes);
+        } else $this->classes = null;
+
+        if (isset($ajaxResult['minLevel'])) {
+            $this->minLevel = $ajaxResult['minLevel'];
+//            var_dump($this->minLevel);
+        } else $this->minLevel = null;
+
+        if (isset($ajaxResult['maxLevel'])) {
+            $this->maxLevel = $ajaxResult['maxLevel'];
+//            var_dump($this->maxLevel);
+        } else $this->maxLevel = null;
+    }
+
+    private function getAllFiltersData() {
+
+        if ($this->runes) {
+            $this->wordsByRunes = $this->model->getFilteredWordsByRunes($this->runes);
+        } else $this->wordsByRunes = null;
+
+        if ($this->classes) {
+            $this->wordsByClasses = $this->model->getWordsByClasses($this->classes);
+        } else $this->wordsByClasses = null;
+
+        if ($this->sockets) {
+            $this->wordsBySockets = $this->model->getWordsBySockets($this->sockets);
+        } else $this->wordsBySockets = null;
+
+    }
 
     /**
-     * @param array $runesFilter - words id's filtered by runes
-     * @param array $classesAndSocketsFilters - words id's filtered by classes and sockets
      * @return array of unique id's of filtered words by input filters
      */
-    private function selectUniqueWordsFromFilters(array $runesFilter = null, array $classesAndSocketsFilters = null) {
+    private function selectUniqueWordsFromFilters() {
         $runesFilterValues = [];
-        $classesAndSocketsFiltersValues = [];
+        $socketsFilterValues = [];
+        $classesFilterValues = [];
+//        $levelsFilterValues = [];
 
-        if ($runesFilter) {
+        if (isset($this->wordsByRunes->words)) {
+            $runesFilterValues[] = explode(',', $this->wordsByRunes->words);
+        }
 
-            foreach ($runesFilter as $word) {
-                $runesFilterValues[] = $word->word_id;
+        if (isset($this->wordsBySockets->words)) {
+            $socketsFilterValues[] = explode(',', $this->wordsBySockets->words);
+            var_dump($socketsFilterValues);
+        }
+
+        if ($this->wordsByClasses) {
+
+            foreach ($this->wordsByClasses as $word) {
+                $classesFilterValues[] = $word->word_id;
             }
         }
 
-        if ($classesAndSocketsFilters) {
+        $uniqueWords = array_intersect($runesFilterValues, $socketsFilterValues);
 
-            foreach ($classesAndSocketsFilters as $word) {
-                $classesAndSocketsFiltersValues[] = $word->word_id;
-            }
-        }
+        var_dump($uniqueWords);
 
-        $uniqueWords = array_merge($runesFilterValues, $classesAndSocketsFiltersValues);
-
-        return array_unique($uniqueWords);
+        return $uniqueWords;
     }
 
     /**
@@ -229,7 +263,7 @@ class WordsAjaxHandler extends Controller {
      * @param array $uniqueWords - filtered word's id
      * @return array of words and their properties, runes and equipment
      */
-    private function combineDataInJSON(array $uniqueWords) {
+    private function combineWordsData(array $uniqueWords) {
         $wordsArray = [];
 
         foreach ($uniqueWords as $key => $wordId) {
