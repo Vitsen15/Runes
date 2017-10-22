@@ -135,11 +135,12 @@ class WordsAjaxHandler extends Controller {
 //        $levelsFilterValues = [];
 
         if (isset($this->wordsByRunes->words)) {
-            $runesFilterValues[] = explode(',', $this->wordsByRunes->words);
+            $runesFilterValues = explode(',', $this->wordsByRunes->words);
+            var_dump($runesFilterValues);
         }
 
         if (isset($this->wordsBySockets->words)) {
-            $socketsFilterValues[] = explode(',', $this->wordsBySockets->words);
+            $socketsFilterValues = explode(',', $this->wordsBySockets->words);
             var_dump($socketsFilterValues);
         }
 
@@ -148,13 +149,22 @@ class WordsAjaxHandler extends Controller {
             foreach ($this->wordsByClasses as $word) {
                 $classesFilterValues[] = $word->word_id;
             }
+            var_dump($classesFilterValues);
         }
 
-        $uniqueWords = array_intersect($runesFilterValues, $socketsFilterValues);
+        $uniqueWords = [$runesFilterValues,
+            $socketsFilterValues
+        ];
 
-        var_dump($uniqueWords);
+//        call_user_func_array('array_intersect', $uniqueWords);
 
-        return $uniqueWords;
+//        var_dump($uniqueWords);
+
+        $result = array_intersect(...$uniqueWords);
+        var_dump('====================================');
+        var_dump($result);
+
+        return $result;
     }
 
     /**

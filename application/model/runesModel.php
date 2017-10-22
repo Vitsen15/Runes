@@ -68,16 +68,20 @@ class RunesModel extends Model {
             return false;
         }
 
+        var_dump($wordsId);
+
         $wordsIdInQuery = implode(',', $wordsId);
 
         $sql = "SELECT
                   words.id AS word_id,
                   words.name AS word_name
                 FROM words
-                WHERE words.id IN (" . $wordsIdInQuery . ")";
+                WHERE words.id IN (:words)";
 
         $query = $this->db->prepare($sql);
+        $query->bindParam(':words', $wordsIdInQuery, PDO::PARAM_STR);
         $query->execute();
+//        var_dump($query);
         return $query->fetchAll();
     }
 
@@ -152,6 +156,7 @@ class RunesModel extends Model {
      * @param array $classes
      * @return mixed
      */
+    //TODO: see how to use arrays with bindParam and in clause
     public function getWordsByClasses(array $classes = null) {
         if ($classes == null) {
             return false;
@@ -166,10 +171,12 @@ class RunesModel extends Model {
                   INNER JOIN word_properties ON word_properties.id = words_word_properties.runes_word_property_id
                   INNER JOIN classes_word_properties ON classes_word_properties.runes_word_property_id = words_word_properties.id
                   INNER JOIN classes ON classes.id = classes_word_properties.class_id
-                WHERE classes.id IN (" . $classesInQuery . ")
+                # WHERE FIND_IN_SET (classes.id, :classes)
+                WHERE find_in_set(cast(classes.id as char), :classes)
                 GROUP BY word_id";
 
         $query = $this->db->prepare($sql);
+        $query->bindParam(':classes', $classesInQuery);
         $query->execute();
 
         return $query->fetchAll();
