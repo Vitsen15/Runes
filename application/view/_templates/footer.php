@@ -21,7 +21,6 @@
                 {{#each equipment.idEquip_equip}}
                     {{this}}<br>
                 {{/each}}
-                (Количество сокетов: {{equipment.sockets}})
             </td>
             <td>
                 {{#each runes.id_name}}

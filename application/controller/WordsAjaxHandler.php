@@ -16,6 +16,7 @@ class WordsAjaxHandler extends Controller {
     private $wordsBySockets;
     private $wordsByClasses;
     private $wordsByLevels;
+    private $wordsByEquipment;
 
     // Combined words id's by all filters
     private $uniqueWordsID;
@@ -112,15 +113,19 @@ class WordsAjaxHandler extends Controller {
     private function getAllFiltersData() {
 
         if ($this->runes) {
-            $this->wordsByRunes = $this->model->getFilteredWordsByRunes($this->runes);
+            $this->wordsByRunes = $this->model->filterWordsByRunes($this->runes);
         } else $this->wordsByRunes = null;
 
         if ($this->classes) {
-            $this->wordsByClasses = $this->model->getWordsByClasses($this->classes);
+            $this->wordsByClasses = $this->model->filterWordsByClasses($this->classes);
         } else $this->wordsByClasses = null;
 
         if ($this->sockets) {
-            $this->wordsBySockets = $this->model->getWordsBySockets($this->sockets);
+            $this->wordsBySockets = $this->model->filterWordsBySockets($this->sockets);
+        } else $this->wordsBySockets = null;
+
+        if ($this->minLevel && $this->maxLevel) {
+            $this->wordsByLevels = $this->model->filterWordsByLevels($this->minLevel, $this->maxLevel);
         } else $this->wordsBySockets = null;
 
     }
@@ -129,42 +134,30 @@ class WordsAjaxHandler extends Controller {
      * @return array of unique id's of filtered words by input filters
      */
     private function selectUniqueWordsFromFilters() {
-        $runesFilterValues = [];
-        $socketsFilterValues = [];
-        $classesFilterValues = [];
-//        $levelsFilterValues = [];
+        $filtersData = [];
 
         if (isset($this->wordsByRunes->words)) {
-            $runesFilterValues = explode(',', $this->wordsByRunes->words);
-            var_dump($runesFilterValues);
+            $filtersData[] = explode(',', $this->wordsByRunes->words);
         }
 
         if (isset($this->wordsBySockets->words)) {
-            $socketsFilterValues = explode(',', $this->wordsBySockets->words);
-            var_dump($socketsFilterValues);
+            $filtersData[] = explode(',', $this->wordsBySockets->words);
         }
 
-        if ($this->wordsByClasses) {
-
-            foreach ($this->wordsByClasses as $word) {
-                $classesFilterValues[] = $word->word_id;
-            }
-            var_dump($classesFilterValues);
+        if (isset($this->wordsByClasses->words)) {
+            $filtersData[] = explode(',', $this->wordsByClasses->words);
         }
 
-        $uniqueWords = [$runesFilterValues,
-            $socketsFilterValues
-        ];
+        if (isset($this->wordsByLevels->words)) {
+            $filtersData[] = explode(',', $this->wordsByLevels->words);
+        }
 
-//        call_user_func_array('array_intersect', $uniqueWords);
-
-//        var_dump($uniqueWords);
-
-        $result = array_intersect(...$uniqueWords);
-        var_dump('====================================');
-        var_dump($result);
-
-        return $result;
+        if (count($filtersData) === 1) {
+            return $filtersData[0];
+        } else {
+            $uniqueWords = array_intersect(...$filtersData);
+            return $uniqueWords;
+        }
     }
 
     /**
@@ -257,7 +250,7 @@ class WordsAjaxHandler extends Controller {
             foreach ($wordsEquipment as $equipment) {
 
                 if ($equipment->word_id == $wordId) {
-                    $wordEquipment['idEquip_equip'][$equipment->equipment_id] = $equipment->equipment;
+                    $wordEquipment['idEquip_equip'][$equipment->equipment_id] = $equipment->description;
                 }
             }
 

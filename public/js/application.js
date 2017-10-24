@@ -75,8 +75,8 @@ $(function () {
                     appendNotFoundException();
                     return;
                 }
-                console.log(data);
-                appendFoundWords(data);
+                console.log(JSON.parse(data));
+                appendFoundWords(JSON.parse(data));
             });
     };
 
