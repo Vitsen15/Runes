@@ -6,6 +6,7 @@ $(function () {
         formSubmitPreventDefault();
         levelFiltersValidation();
         resetFilters();
+        resetWords();
     });
 
     function formSubmitPreventDefault() {
@@ -16,10 +17,24 @@ $(function () {
 
     function resetFilters() {
         var $resetFilters = $('#reset-filters');
-        var $filters = $("input[name='runes[]'], [name='sockets[]'], [name='classes[]']");
+        var $filters = $("input[name='runes[]'], [name='sockets[]'], [name='classes[]'], [name='equip_type[]']");
+        var levelFilters = $("input[name='maxLevel'], [name='minLevel']");
+        var levelsFiltersOutput = $("output[name='minLevelOutput'], [name='maxLevelOutput']");
+
 
         $resetFilters.click(function () {
             $filters.prop('checked', false);
+            levelFilters.val(false);
+            levelsFiltersOutput.val(false);
+        });
+    }
+
+    function resetWords() {
+        var $resetWordsButton = $("#reset-words");
+        var $wordsWrapper = $("#words-wrapper");
+
+        $resetWordsButton.click(function () {
+            $wordsWrapper.empty();
         });
     }
 

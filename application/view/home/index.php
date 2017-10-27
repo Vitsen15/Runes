@@ -123,6 +123,7 @@
         </fieldset>
         <button type="submit" onclick="sendFilterData()">Найти</button>
         <button id="reset-filters">Сбросить фильтры</button>
+        <button id="reset-words">Сбросить найденые слова</button>
     </form>
     <div id="words-wrapper">
 
