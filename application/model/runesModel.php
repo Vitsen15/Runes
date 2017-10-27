@@ -54,6 +54,20 @@ class RunesModel extends Model {
         return $query->fetchAll();
     }
 
+    public function getEquipment() {
+        $sql = "SELECT
+                  equipment.type_id,
+                  equipment.type_parent_id,
+                  equipment.type_name,
+                  equipment.description
+                FROM equipment";
+
+        $query = $this->db->prepare($sql);
+        $query->execute();
+
+        return $query->fetchAll();
+    }
+
 //  ==================  Words filters  ============================
     public function getAllWords() {
 
@@ -157,6 +171,54 @@ class RunesModel extends Model {
         $query->execute();
 
         return $query->fetch();
+    }
+
+    public function filterWordsByEquipment(array $equipment) {
+        if ($equipment == null) {
+            return false;
+        } else {
+            asort($equipment);
+            $equipmentInQuery = implode(',', $equipment);
+        }
+
+        $EquipSQL = "SELECT GROUP_CONCAT(children_nodes SEPARATOR ',') AS children_nodes FROM (
+                                                SELECT @Ids := (
+                                                  SELECT GROUP_CONCAT(`type_id` SEPARATOR ',')
+                                                  FROM `equipment`
+                                                  WHERE FIND_IN_SET(`type_parent_id`, @Ids)
+                                                ) children_nodes
+                                                FROM `equipment`
+                                                  JOIN (SELECT @Ids := :equip ) temp1
+                                                WHERE FIND_IN_SET(`type_parent_id`, @Ids)
+                                              ) temp2";
+
+        $equipQuery = $this->db->prepare($EquipSQL);
+
+        $equipQuery->bindParam(':equip', $equipmentInQuery);
+        $equipQuery->execute();
+        $equipResult = $equipQuery->fetch();
+        $equipQuery->closeCursor();
+
+        if (isset($equipResult->children_nodes)) {
+            $equipResult = explode(',', $equipResult->children_nodes);
+            $equipResult = array_unique($equipResult);
+            $equipResult = array_merge($equipResult, $equipment);// add selected item to searched
+            $equipResult = implode(',', $equipResult);
+//            var_dump($equipResult);
+        } else {
+            $equipResult = $equipmentInQuery;
+        }
+
+        $wordsSQL = "SELECT group_concat(words.word_id) AS words FROM (SELECT words_equipment.runes_word_id AS word_id
+                                            FROM words_equipment
+                                              INNER JOIN equipment ON equipment.type_id = words_equipment.equipment_id
+                                            WHERE find_in_set(cast(equipment.type_id AS CHAR), :equipment)) AS words";
+
+        $wordsQuery = $this->db->prepare($wordsSQL);
+        $wordsQuery->bindParam(':equipment', $equipResult);
+        $wordsQuery->execute();
+
+        return $wordsQuery->fetch();
     }
 
 //  ======================  Words properties  =================================

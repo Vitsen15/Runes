@@ -10,6 +10,7 @@ class WordsAjaxHandler extends Controller {
     private $classes;
     private $minLevel;
     private $maxLevel;
+    private $equipment;
 
     // Filters values
     private $wordsByRunes;
@@ -59,21 +60,21 @@ class WordsAjaxHandler extends Controller {
      * @return bool
      */
     private function collectDataForResponse() {
-        $this->uniqueWordsID = $this->selectUniqueWordsFromFilters();
-//        var_dump($this->uniqueWordsID);
-        asort($this->uniqueWordsID);
-
-        $this->wordsNames = $this->getWordsNames($this->uniqueWordsID);
-
-        $this->wordsProperties = $this->getWordsProperties($this->uniqueWordsID);
-
-        $this->wordsRunes = $this->getWordsRunes($this->uniqueWordsID);
-
-        $this->wordsEquip = ($this->getWordsEquipment($this->uniqueWordsID));
+        $this->uniqueWordsID = $this->selectUniqueWordsIDFromFilters();
 
         if (!$this->uniqueWordsID) {
             return false;
         } else {
+            asort($this->uniqueWordsID);
+
+            $this->wordsNames = $this->getWordsNames($this->uniqueWordsID);
+
+            $this->wordsProperties = $this->getWordsProperties($this->uniqueWordsID);
+
+            $this->wordsRunes = $this->getWordsRunes($this->uniqueWordsID);
+
+            $this->wordsEquip = ($this->getWordsEquipment($this->uniqueWordsID));
+
             return true;
         }
     }
@@ -108,6 +109,11 @@ class WordsAjaxHandler extends Controller {
             $this->maxLevel = $ajaxResult['maxLevel'];
 //            var_dump($this->maxLevel);
         } else $this->maxLevel = null;
+
+        if (isset($ajaxResult['equip_type'])) {
+            $this->equipment = $ajaxResult['equip_type'];
+//            var_dump($this->equipment);
+        }
     }
 
     private function getAllFiltersData() {
@@ -128,12 +134,17 @@ class WordsAjaxHandler extends Controller {
             $this->wordsByLevels = $this->model->filterWordsByLevels($this->minLevel, $this->maxLevel);
         } else $this->wordsBySockets = null;
 
+        if ($this->equipment) {
+            $this->wordsByEquipment = $this->model->filterWordsByEquipment($this->equipment);
+//            var_dump($this->wordsByEquipment);
+        } else $this->wordsByEquipment = null;
+
     }
 
     /**
-     * @return array of unique id's of filtered words by input filters
+     * @return mixed of unique id's of filtered words by input filters
      */
-    private function selectUniqueWordsFromFilters() {
+    private function selectUniqueWordsIDFromFilters() {
         $filtersData = [];
 
         if (isset($this->wordsByRunes->words)) {
@@ -152,8 +163,14 @@ class WordsAjaxHandler extends Controller {
             $filtersData[] = explode(',', $this->wordsByLevels->words);
         }
 
+        if (isset($this->wordsByEquipment->words)) {
+            $filtersData[] = explode(',', $this->wordsByEquipment->words);
+        }
+
         if (count($filtersData) === 1) {
             return $filtersData[0];
+        } elseif (count($filtersData) === 0) {
+            return false;
         } else {
             $uniqueWords = array_intersect(...$filtersData);
             return $uniqueWords;

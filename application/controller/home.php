@@ -5,6 +5,7 @@ class Home extends Controller {
     public $runesController;
     public $classesController;
     public $levelsController;
+    public $equipmentController;
 
     /**
      * PAGE: index
@@ -19,6 +20,7 @@ class Home extends Controller {
         require_once APP . 'controller/Runes.php';
         require_once APP . 'controller/Classes.php';
         require_once APP . 'controller/Levels.php';
+        require_once APP . 'controller/Equipment.php';
 
         $this->db = new DBConnection();
         $this->model = new RunesModel($this->db);
@@ -26,6 +28,7 @@ class Home extends Controller {
         $this->runesController = new Runes($this->model);
         $this->classesController = new Classes($this->model);
         $this->levelsController = new Levels($this->model);
+        $this->equipmentController = new Equipment($this->model);
 
         // load views
         require APP . 'view/_templates/header.php';

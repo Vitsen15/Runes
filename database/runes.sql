@@ -94,7 +94,7 @@ CREATE TABLE `equipment` (
 -- Дамп данных таблицы `equipment`
 --
 
-INSERT INTO `equipment` (type_id, type_name, parent_id) VALUES
+INSERT INTO `equipment` (type_id, type_name, type_parent_id) VALUES
 (9, 'Дубина', 3),
 (10, 'Молот', 3),
 (11, 'Булава', 3),
