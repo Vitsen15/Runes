@@ -4,12 +4,7 @@ require_once APP . 'model/model.php';
 
 class RunesModel extends Model {
     public function getAllRunes() {
-        $sql = "SELECT
-                  runes.id,
-                  runes.name,
-                  runes.img_url,
-                  runes.lvl
-                FROM runes";
+        $sql = file_get_contents('sql/queries/getAllRunes.sql', FILE_USE_INCLUDE_PATH);
         $query = $this->db->prepare($sql);
         $query->execute();
 
@@ -17,14 +12,7 @@ class RunesModel extends Model {
     }
 
     public function getAllRunesProperties() {
-        $sql = "SELECT
-                  runes.id AS rune_id,
-                  rune_properties.property,
-                  rune_properties.in_armour,
-                  rune_properties.in_weapon
-                FROM runes
-                  INNER JOIN runes_rune_properties ON runes_rune_properties.rune_id = runes.id
-                  JOIN rune_properties ON rune_properties.id = runes_rune_properties.property_id";
+        $sql = file_get_contents('sql/queries/getAllRunesProperties.sql', FILE_USE_INCLUDE_PATH);
         $query = $this->db->prepare($sql);
         $query->execute();
 
@@ -32,10 +20,7 @@ class RunesModel extends Model {
     }
 
     public function getClasses() {
-        $sql = "SELECT
-                  classes.id,
-                  classes.name
-                FROM classes";
+        $sql = file_get_contents('sql/queries/getClasses.sql', FILE_USE_INCLUDE_PATH);
 
         $query = $this->db->prepare($sql);
         $query->execute();
@@ -44,9 +29,7 @@ class RunesModel extends Model {
     }
 
     public function getLevels() {
-        $sql = "SELECT DISTINCT runes.lvl
-                FROM runes
-                ORDER BY runes.lvl ASC";
+        $sql = file_get_contents('sql/queries/getLevels.sql', FILE_USE_INCLUDE_PATH);;
 
         $query = $this->db->prepare($sql);
         $query->execute();
@@ -55,12 +38,7 @@ class RunesModel extends Model {
     }
 
     public function getEquipment() {
-        $sql = "SELECT
-                  equipment.type_id,
-                  equipment.type_parent_id,
-                  equipment.type_name,
-                  equipment.description
-                FROM equipment";
+        $sql = file_get_contents('sql/queries/getEquipment.sql', FILE_USE_INCLUDE_PATH);;;
 
         $query = $this->db->prepare($sql);
         $query->execute();
@@ -109,15 +87,7 @@ class RunesModel extends Model {
 
         $classesInQuery = implode(',', $classes);
 
-        $sql = "SELECT group_concat(words.id) AS words
-                FROM (SELECT words.id
-                      FROM words
-                        INNER JOIN words_word_properties ON words_word_properties.runes_word_id = words.id
-                        INNER JOIN word_properties ON word_properties.id = words_word_properties.runes_word_property_id
-                        INNER JOIN classes_word_properties ON classes_word_properties.runes_word_property_id = words_word_properties.id
-                        INNER JOIN classes ON classes.id = classes_word_properties.class_id
-                      WHERE find_in_set(cast(classes.id AS CHAR), :classes)
-                      GROUP BY words.id) AS words";
+        $sql = file_get_contents('sql/queries/filterWordsByClasses.sql', FILE_USE_INCLUDE_PATH);
 
         $query = $this->db->prepare($sql);
         $query->bindParam(':classes', $classesInQuery);
@@ -147,22 +117,7 @@ class RunesModel extends Model {
     }
 
     public function filterWordsByLevels(int $minLevel, int $maxLevel) {
-        $sql = "SELECT group_concat(words.id) AS words FROM (SELECT
-                   words.id
-                 FROM words
-                   INNER JOIN runes_order ON runes_order.runes_word_id = words.id
-                   INNER JOIN runes ON runes.id = runes_order.rune_id
-                 WHERE runes.lvl BETWEEN :min AND :max AND words.id NOT IN (
-                   SELECT words.id
-                   FROM (
-                          SELECT words.id
-                          FROM words
-                            INNER JOIN runes_order ON runes_order.runes_word_id = words.id
-                            INNER JOIN runes ON runes.id = runes_order.rune_id
-                          WHERE runes.lvl < :min OR runes.lvl > :max
-                        ) AS words
-                 )
-                 GROUP BY words.id) words";
+        $sql = file_get_contents('sql/queries/filterWordsByLevels.sql', FILE_USE_INCLUDE_PATH);
 
         $query = $this->db->prepare($sql);
 
@@ -181,16 +136,7 @@ class RunesModel extends Model {
             $equipmentInQuery = implode(',', $equipment);
         }
 
-        $EquipSQL = "SELECT GROUP_CONCAT(children_nodes SEPARATOR ',') AS children_nodes FROM (
-                                                SELECT @Ids := (
-                                                  SELECT GROUP_CONCAT(`type_id` SEPARATOR ',')
-                                                  FROM `equipment`
-                                                  WHERE FIND_IN_SET(`type_parent_id`, @Ids)
-                                                ) children_nodes
-                                                FROM `equipment`
-                                                  JOIN (SELECT @Ids := :equip ) temp1
-                                                WHERE FIND_IN_SET(`type_parent_id`, @Ids)
-                                              ) temp2";
+        $EquipSQL = file_get_contents('sql/queries/getNestedEquipmentByClientFilters.sql', FILE_USE_INCLUDE_PATH);
 
         $equipQuery = $this->db->prepare($EquipSQL);
 
@@ -204,15 +150,11 @@ class RunesModel extends Model {
             $equipResult = array_unique($equipResult);
             $equipResult = array_merge($equipResult, $equipment);// add selected item to searched
             $equipResult = implode(',', $equipResult);
-//            var_dump($equipResult);
         } else {
             $equipResult = $equipmentInQuery;
         }
 
-        $wordsSQL = "SELECT group_concat(words.word_id) AS words FROM (SELECT words_equipment.runes_word_id AS word_id
-                                            FROM words_equipment
-                                              INNER JOIN equipment ON equipment.type_id = words_equipment.equipment_id
-                                            WHERE find_in_set(cast(equipment.type_id AS CHAR), :equipment)) AS words";
+        $wordsSQL = file_get_contents('sql/queries/filterWordsByEquipment.sql', FILE_USE_INCLUDE_PATH);
 
         $wordsQuery = $this->db->prepare($wordsSQL);
         $wordsQuery->bindParam(':equipment', $equipResult);
@@ -229,11 +171,7 @@ class RunesModel extends Model {
 
         $wordsIdInQuery = implode(',', $wordsId);
 
-        $sql = "SELECT
-                  words.id AS word_id,
-                  words.name AS word_name
-                FROM words
-                WHERE find_in_set(cast(words.id AS CHAR), :words)";
+        $sql = file_get_contents('sql/queries/getWordsNamesByID.sql', FILE_USE_INCLUDE_PATH);
 
         $query = $this->db->prepare($sql);
         $query->bindParam(':words', $wordsIdInQuery, PDO::PARAM_STR);
@@ -249,17 +187,10 @@ class RunesModel extends Model {
 
         $wordsIdInQuery = implode(',', $wordsId);
 
-        $sql = "SELECT
-                  words.id AS word_id,
-                  runes.id   AS rune_id,
-                  runes.name AS rune_name,
-                  runes_order.rune_order
-                FROM words
-                  INNER JOIN runes_order ON runes_order.runes_word_id = words.id
-                  INNER JOIN runes ON runes.id = runes_order.rune_id
-                WHERE words.id IN (" . $wordsIdInQuery . ")";
+        $sql = file_get_contents('sql/queries/getWordsRunesByID.sql', FILE_USE_INCLUDE_PATH);;
 
         $query = $this->db->prepare($sql);
+        $query->bindParam(':words', $wordsIdInQuery);
         $query->execute();
         return $query->fetchAll();
     }
@@ -271,15 +202,10 @@ class RunesModel extends Model {
 
         $wordsIdInQuery = implode(',', $wordsId);
 
-        $sql = "SELECT
-                  words.id,
-                  word_properties.property
-                FROM word_properties
-                  INNER JOIN words_word_properties ON word_properties.id = words_word_properties.runes_word_property_id
-                  INNER JOIN words ON words.id = words_word_properties.runes_word_id
-                WHERE words.id IN (" . $wordsIdInQuery . ")";
+        $sql = file_get_contents('sql/queries/getWordPropertiesByID.sql', FILE_USE_INCLUDE_PATH);
 
         $query = $this->db->prepare($sql);
+        $query->bindParam(':words', $wordsIdInQuery);
         $query->execute();
         return $query->fetchAll();
     }
@@ -291,18 +217,12 @@ class RunesModel extends Model {
 
         $wordsIdInQuery = implode(',', $wordsId);
 
-        $sql = "SELECT
-                  words.id            AS word_id,
-                  equipment.type_id   AS equipment_id,
-                  equipment.description AS description
-                FROM words
-                  INNER JOIN words_equipment ON words_equipment.runes_word_id = words.id
-                  INNER JOIN equipment ON equipment.type_id = words_equipment.equipment_id
-                WHERE find_in_set(cast(words.id AS CHAR), :words)";
+        $sql = file_get_contents('sql/queries/getWordsEquipmentByID.sql', FILE_USE_INCLUDE_PATH);
 
         $query = $this->db->prepare($sql);
         $query->bindParam(':words', $wordsIdInQuery, PDO::PARAM_STR);
         $query->execute();
+
         return $query->fetchAll();
     }
 }
