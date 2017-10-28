@@ -5,21 +5,21 @@ require_once APP . 'model/runesModel.php';
 
 class WordsAjaxHandler extends Controller {
     // Data from client filters
-    private $runes;
-    private $sockets;
-    private $classes;
-    private $minLevel;
-    private $maxLevel;
-    private $equipment;
+    private $runesFromClient;
+    private $socketsFromClient;
+    private $classesFromClient;
+    private $minLevelFromClient;
+    private $maxLevelFromClient;
+    private $equipmentFromClient;
 
-    // Filters values
-    private $wordsByRunes;
-    private $wordsBySockets;
-    private $wordsByClasses;
-    private $wordsByLevels;
-    private $wordsByEquipment;
+    // Filtered words id
+    private $wordsIdByRunes;
+    private $wordsIdBySockets;
+    private $wordsIdByClasses;
+    private $wordsIdByLevels;
+    private $wordsIdByEquipment;
 
-    // Combined words id's by all filters
+    // Combined words id by all filters
     private $uniqueWordsID;
 
     // Data to form response json
@@ -36,13 +36,47 @@ class WordsAjaxHandler extends Controller {
 
         $this->getClientFiltersData();
 
-        $this->getAllFiltersData();
+        $this->getFiltersResults();
 
         $this->formResponseJSON();
     }
 
     /**
-     * Creates JSON as result of all filters work and sent it to client
+     * Saves filters data that comes from client
+     */
+    private function getClientFiltersData() {
+        $ajaxResult = $_POST;
+
+        $this->runesFromClient = isset($ajaxResult['runes']) ? $this->runesFromClient = $ajaxResult['runes'] : null;
+
+        $this->socketsFromClient = isset($ajaxResult['sockets']) ? $ajaxResult['sockets'] : null;
+
+        $this->classesFromClient = isset($ajaxResult['classes']) ? $ajaxResult['classes'] : null;
+
+        $this->minLevelFromClient = isset($ajaxResult['minLevel']) ? $ajaxResult['minLevel'] : null;
+
+        $this->maxLevelFromClient = isset($ajaxResult['maxLevel']) ? $ajaxResult['maxLevel'] : null;
+
+        $this->equipmentFromClient = isset($ajaxResult['equip_type']) ? $ajaxResult['equip_type'] : null;
+    }
+
+    /**
+     * Gets words id from DB by filters values from client
+     */
+    private function getFiltersResults() {
+        $this->wordsIdByRunes = $this->runesFromClient ? $this->model->filterWordsByRunes($this->runesFromClient) : null;
+
+        $this->wordsIdByClasses = $this->classesFromClient ? $this->model->filterWordsByClasses($this->classesFromClient) : null;
+
+        $this->wordsIdBySockets = $this->socketsFromClient ? $this->model->filterWordsBySockets($this->socketsFromClient) : null;
+
+        $this->wordsIdByLevels = ($this->minLevelFromClient && $this->maxLevelFromClient) ? $this->model->filterWordsByLevels($this->minLevelFromClient, $this->maxLevelFromClient) : null;
+
+        $this->wordsIdByEquipment = $this->equipmentFromClient ? $this->model->filterWordsByEquipment($this->equipmentFromClient) : null;
+    }
+
+    /**
+     * Creates JSON as result of all filters work and send it to client
      */
     private function formResponseJSON() {
         if (!$this->collectDataForResponse()) {
@@ -80,91 +114,30 @@ class WordsAjaxHandler extends Controller {
     }
 
     /**
-     * Saves filters data that comes from client
-     */
-    private function getClientFiltersData() {
-        $ajaxResult = $_POST;
-
-        if (isset($ajaxResult['runes'])) {
-            $this->runes = $ajaxResult['runes'];
-//            var_dump($this->runes);
-        } else $this->runes = null;
-
-        if (isset($ajaxResult['sockets'])) {
-            $this->sockets = $ajaxResult['sockets'];
-//            var_dump($this->sockets);
-        } else $this->sockets = null;
-
-        if (isset($ajaxResult['classes'])) {
-            $this->classes = $ajaxResult['classes'];
-//            var_dump($this->classes);
-        } else $this->classes = null;
-
-        if (isset($ajaxResult['minLevel'])) {
-            $this->minLevel = $ajaxResult['minLevel'];
-//            var_dump($this->minLevel);
-        } else $this->minLevel = null;
-
-        if (isset($ajaxResult['maxLevel'])) {
-            $this->maxLevel = $ajaxResult['maxLevel'];
-//            var_dump($this->maxLevel);
-        } else $this->maxLevel = null;
-
-        if (isset($ajaxResult['equip_type'])) {
-            $this->equipment = $ajaxResult['equip_type'];
-//            var_dump($this->equipment);
-        }
-    }
-
-    private function getAllFiltersData() {
-
-        if ($this->runes) {
-            $this->wordsByRunes = $this->model->filterWordsByRunes($this->runes);
-        } else $this->wordsByRunes = null;
-
-        if ($this->classes) {
-            $this->wordsByClasses = $this->model->filterWordsByClasses($this->classes);
-        } else $this->wordsByClasses = null;
-
-        if ($this->sockets) {
-            $this->wordsBySockets = $this->model->filterWordsBySockets($this->sockets);
-        } else $this->wordsBySockets = null;
-
-        if ($this->minLevel && $this->maxLevel) {
-            $this->wordsByLevels = $this->model->filterWordsByLevels($this->minLevel, $this->maxLevel);
-        } else $this->wordsBySockets = null;
-
-        if ($this->equipment) {
-            $this->wordsByEquipment = $this->model->filterWordsByEquipment($this->equipment);
-//            var_dump($this->wordsByEquipment);
-        } else $this->wordsByEquipment = null;
-
-    }
-
-    /**
-     * @return mixed of unique id's of filtered words by input filters
+     * @return mixed array of unique id's of filtered words by input filters
+     * or false if not selected any filter
      */
     private function selectUniqueWordsIDFromFilters() {
         $filtersData = [];
 
-        if (isset($this->wordsByRunes->words)) {
-            $filtersData[] = explode(',', $this->wordsByRunes->words);
+        if (isset($this->wordsIdByRunes->words)) {
+            $filtersData[] = explode(',', $this->wordsIdByRunes->words);
         }
 
-        if (isset($this->wordsBySockets->words)) {
-            $filtersData[] = explode(',', $this->wordsBySockets->words);
+        if (isset($this->wordsIdBySockets->words)) {
+            $filtersData[] = explode(',', $this->wordsIdBySockets->words);
         }
 
-        if (isset($this->wordsByClasses->words)) {
-            $filtersData[] = explode(',', $this->wordsByClasses->words);
+        if (isset($this->wordsIdByClasses->words)) {
+            $filtersData[] = explode(',', $this->wordsIdByClasses->words);
         }
 
-        if (isset($this->wordsByLevels->words)) {
-            $filtersData[] = explode(',', $this->wordsByLevels->words);
+        if (isset($this->wordsIdByLevels->words)) {
+            $filtersData[] = explode(',', $this->wordsIdByLevels->words);
         }
 
-        if (isset($this->wordsByEquipment->words)) {
-            $filtersData[] = explode(',', $this->wordsByEquipment->words);
+        if (isset($this->wordsIdByEquipment->words)) {
+            $filtersData[] = explode(',', $this->wordsIdByEquipment->words);
         }
 
         if (count($filtersData) === 1) {

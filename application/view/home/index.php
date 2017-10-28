@@ -94,6 +94,7 @@
                 <input type="range" name="minLevel" list="min-levels-list"
                        min="<?php echo $this->levelsController->levels[0]; ?>"
                        max="<?php echo end($this->levelsController->levels); ?>"
+                       value="<?php echo $this->levelsController->levels[0]; ?>"
                        oninput="minLevelOutput.value = minLevel.value">
                 <output name="minLevelOutput"><?php echo $this->levelsController->levels[0]; ?></output>
                 <datalist id="min-levels-list">
@@ -107,6 +108,7 @@
                 <input type="range" name="maxLevel" list="min-levels-list"
                        min="<?php echo $this->levelsController->levels[0]; ?>"
                        max="<?php echo end($this->levelsController->levels); ?>"
+                       value="<?php echo end($this->levelsController->levels); ?>"
                        oninput="maxLevelOutput.value = maxLevel.value">
                 <output name="maxLevelOutput"><?php echo end($this->levelsController->levels); ?></output>
                 <datalist id="min-levels-list">

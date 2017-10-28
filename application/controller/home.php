@@ -7,10 +7,6 @@ class Home extends Controller {
     public $levelsController;
     public $equipmentController;
 
-    /**
-     * PAGE: index
-     * This method handles what happens when you move to http://yourproject/home/index (which is the default page btw)
-     */
     public function index() {
         //load model and db connection
         require_once APP . 'core/DBConnection.php';
