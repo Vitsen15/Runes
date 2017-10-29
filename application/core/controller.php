@@ -4,12 +4,12 @@ class Controller {
     /**
      * @var null Database Connection
      */
-    public $db = null;
+    protected $db = null;
 
     /**
      * @var null model
      */
-    public $model = null;
+    protected $model = null;
 
     /**
      * Whenever controller is created, open a database connection too and load "the model".
