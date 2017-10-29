@@ -11,7 +11,7 @@ class Sockets extends Controller {
     }
 
     private function fillSockets() {
-        for ($i = 0; $i <= 6; $i++) {
+        for ($i = 1; $i <= 6; $i++) {
             $this->sockets[$i] = [$i];
         }
     }
