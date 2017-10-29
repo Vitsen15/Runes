@@ -9,7 +9,6 @@ class Equipment extends Controller {
         $this->unstructuredEquipment = $this->model->getEquipment();
         $this->unstructuredEquipment = $this->resetResponseDBArrayIndex($this->unstructuredEquipment);
         $this->equipment = (object)$this->createTreeOfEquipmentTypes($this->unstructuredEquipment);
-        $this->console_log((object)$this->equipment);
     }
 
 
