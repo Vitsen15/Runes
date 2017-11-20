@@ -121,7 +121,9 @@
 
         <fieldset>
             <legend>Выберите тип снаряжения</legend>
-            <?php $this->equipmentController->renderAllEquipment($this->equipmentController->equipment); ?>
+            <ul id="equip-tree">
+                <?php $this->equipmentController->renderAllEquipment($this->equipmentController->equipment); ?>
+            </ul>
         </fieldset>
         <button type="submit" onclick="sendFilterData()">Найти</button>
         <button id="reset-filters">Сбросить фильтры</button>
