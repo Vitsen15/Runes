@@ -1,5 +1,4 @@
 # This file is - if you set up MINI correctly - not needed.
 # But, for fallback reasons (if you don't route your vhost to /public), it will stay here.
-<IfModule dir_module>
-    DirectoryIndex public/index.php
-</IfModule>
+RewriteEngine on
+RewriteRule ^(.*) public/$1 [L]
