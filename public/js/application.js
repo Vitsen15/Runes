@@ -5,6 +5,7 @@ $(function () {
     $(document).ready(function () {
         formSubmitPreventDefault();
         levelFiltersValidation();
+        equipmentSelectionHandler();
         resetFilters();
         resetWords();
     });
@@ -75,6 +76,17 @@ $(function () {
             });
         }
 
+    }
+
+    function equipmentSelectionHandler() {
+        var $equipment = $('#equip-tree').find('li');
+
+        $equipment.on('click', 'input[type=checkbox]', function () {
+            $(this).parent().parents('li').children('[type=checkbox]').prop("indeterminate", true);
+            var $children = $(this).parent().find('li [type=checkbox]');
+            var checkedState = $(this).prop('checked');
+            $children.prop('checked', checkedState);
+        });
     }
 
     window.sendFilterData = function sendFiltersData() {
