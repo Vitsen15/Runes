@@ -82,7 +82,7 @@ $(function () {
         var $equipment = $('#equip-tree').find('li');
 
         $equipment.on('click', 'input[type=checkbox]', function () {
-            $(this).parent().parents('li').children('[type=checkbox]').prop("indeterminate", true);
+            $(this).parent().parents('li').children('[type=checkbox]').prop({"indeterminate": true, "checked": false});
             var $children = $(this).parent().find('li [type=checkbox]');
             var checkedState = $(this).prop('checked');
             $children.prop('checked', checkedState);
@@ -102,7 +102,7 @@ $(function () {
                     appendNotFoundException();
                     return;
                 }
-                console.log(JSON.parse(data));
+                console.log(data);
                 appendFoundWords(JSON.parse(data));
             });
     };
