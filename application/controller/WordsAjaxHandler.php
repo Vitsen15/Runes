@@ -50,17 +50,52 @@ class WordsAjaxHandler extends Controller
     {
         $ajaxResult = $_POST;
 
-        $this->runesFromClient = isset($ajaxResult['runes']) ? $this->runesFromClient = $ajaxResult['runes'] : null;
+        if ($this->validatePostData($ajaxResult)) {
 
-        $this->socketsFromClient = isset($ajaxResult['sockets']) ? $ajaxResult['sockets'] : null;
+            $this->runesFromClient = isset($ajaxResult['runes']) ? $this->runesFromClient = $ajaxResult['runes'] : null;
 
-        $this->classesFromClient = isset($ajaxResult['classes']) ? $ajaxResult['classes'] : null;
+            $this->socketsFromClient = isset($ajaxResult['sockets']) ? $ajaxResult['sockets'] : null;
 
-        $this->minLevelFromClient = isset($ajaxResult['minLevel']) ? $ajaxResult['minLevel'] : null;
+            $this->classesFromClient = isset($ajaxResult['classes']) ? $ajaxResult['classes'] : null;
 
-        $this->maxLevelFromClient = isset($ajaxResult['maxLevel']) ? $ajaxResult['maxLevel'] : null;
+            $this->minLevelFromClient = isset($ajaxResult['minLevel']) ? $ajaxResult['minLevel'] : null;
 
-        $this->equipmentFromClient = isset($ajaxResult['equip_type']) ? $ajaxResult['equip_type'] : null;
+            $this->maxLevelFromClient = isset($ajaxResult['maxLevel']) ? $ajaxResult['maxLevel'] : null;
+
+            $this->equipmentFromClient = isset($ajaxResult['equip_type']) ? $ajaxResult['equip_type'] : null;
+        }
+
+    }
+
+    /**
+     * @param $post - data from client
+     * @return bool
+     */
+    private function validatePostData($post): bool
+    {
+        foreach ($post as $key => $item) {
+
+            if (is_array($item)) {
+                foreach ($item as $filter) {
+
+                    if (is_numeric($filter)) {
+                        continue;
+                    } else {
+                        return false;
+                    }
+                }
+            } elseif (is_numeric($item)) {
+                continue;
+            } else {
+                return false;
+            }
+        }
+
+        if ($post['minLevel'] > $post['maxLevel']){
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -214,91 +249,91 @@ class WordsAjaxHandler extends Controller
                 }
             }
 
-        $formattedWordsProperties[$wordId] = $wordProperties;
-        $wordProperties = null;
-    }
-
-return $formattedWordsProperties;
-}
-
-/**
- * @param array $uniqueWords - filtered word's id
- * @return array of words runes where keys are words id's and them values are two arrays:
- * 1. first array contains runes order in witch keys are rune id and values are rune order in word.
- * 2. second array contains runes names in witch keys are rune id and values are rune name.
- */
-private
-function getWordsRunes(array $uniqueWords)
-{
-    $wordsRunes = $this->model->getWordsRunesByID($uniqueWords);
-    $wordRunes = [];
-    $formattedWordsRunes = [];
-
-    foreach ($uniqueWords as $key => $wordId) {
-
-        foreach ($wordsRunes as $rune) {
-
-            if ($rune->word_id == $wordId) {
-                $wordRunes['id_order'][$rune->rune_id] = $rune->rune_order;
-                $wordRunes['id_name'][$rune->rune_id] = $rune->rune_name;
-            }
+            $formattedWordsProperties[$wordId] = $wordProperties;
+            $wordProperties = null;
         }
 
-        $formattedWordsRunes[$wordId] = $wordRunes;
-        $wordRunes = null;
+        return $formattedWordsProperties;
     }
 
-    return $formattedWordsRunes;
-}
+    /**
+     * @param array $uniqueWords - filtered word's id
+     * @return array of words runes where keys are words id's and them values are two arrays:
+     * 1. first array contains runes order in witch keys are rune id and values are rune order in word.
+     * 2. second array contains runes names in witch keys are rune id and values are rune name.
+     */
+    private
+    function getWordsRunes(array $uniqueWords)
+    {
+        $wordsRunes = $this->model->getWordsRunesByID($uniqueWords);
+        $wordRunes = [];
+        $formattedWordsRunes = [];
 
-/**
- * @param array $uniqueWords - filtered word's id
- * @return array of word equipment where keys are words id's and them values are two arrays:
- * 1. first array contains equipment name in witch keys are equipment id and values are equipment name.
- * 2. second array contains equipment sockets in witch keys are equipment id and values are count of sockets.
- */
-private
-function getWordsEquipment(array $uniqueWords)
-{
-    $wordsEquipment = $this->model->getWordsEquipmentByID($uniqueWords);
-    $wordEquipment = [];
-    $formattedWordEquipment = [];
+        foreach ($uniqueWords as $key => $wordId) {
 
-    foreach ($uniqueWords as $key => $wordId) {
+            foreach ($wordsRunes as $rune) {
 
-        foreach ($wordsEquipment as $equipment) {
-
-            if ($equipment->word_id == $wordId) {
-                $wordEquipment['idEquip_equip'][$equipment->equipment_id] = $equipment->description;
+                if ($rune->word_id == $wordId) {
+                    $wordRunes['id_order'][$rune->rune_id] = $rune->rune_order;
+                    $wordRunes['id_name'][$rune->rune_id] = $rune->rune_name;
+                }
             }
+
+            $formattedWordsRunes[$wordId] = $wordRunes;
+            $wordRunes = null;
         }
 
-        $formattedWordEquipment[$wordId] = $wordEquipment;
-        $wordEquipment = null;
+        return $formattedWordsRunes;
     }
 
-    return $formattedWordEquipment;
-}
+    /**
+     * @param array $uniqueWords - filtered word's id
+     * @return array of word equipment where keys are words id's and them values are two arrays:
+     * 1. first array contains equipment name in witch keys are equipment id and values are equipment name.
+     * 2. second array contains equipment sockets in witch keys are equipment id and values are count of sockets.
+     */
+    private
+    function getWordsEquipment(array $uniqueWords)
+    {
+        $wordsEquipment = $this->model->getWordsEquipmentByID($uniqueWords);
+        $wordEquipment = [];
+        $formattedWordEquipment = [];
 
-/**
- * this method combines all data of words in one array to convert it to JSON
- * @param array $uniqueWords - filtered word's id
- * @return array of words and their properties, runes and equipment
- */
-private
-function combineWordsData(array $uniqueWords)
-{
-    $wordsArray = [];
+        foreach ($uniqueWords as $key => $wordId) {
 
-    foreach ($uniqueWords as $key => $wordId) {
-        $wordsArray[$this->wordsNames[$wordId]]['name'] = $this->wordsNames[$wordId];
-        $wordsArray[$this->wordsNames[$wordId]]['id'] = $wordId;
-        $wordsArray[$this->wordsNames[$wordId]]['properties'] = $this->wordsProperties[$wordId];
-        $wordsArray[$this->wordsNames[$wordId]]['equipment'] = $this->wordsEquip[$wordId];
-        $wordsArray[$this->wordsNames[$wordId]]['runes'] = $this->wordsRunes[$wordId];
+            foreach ($wordsEquipment as $equipment) {
+
+                if ($equipment->word_id == $wordId) {
+                    $wordEquipment['idEquip_equip'][$equipment->equipment_id] = $equipment->description;
+                }
+            }
+
+            $formattedWordEquipment[$wordId] = $wordEquipment;
+            $wordEquipment = null;
+        }
+
+        return $formattedWordEquipment;
     }
 
-    return $wordsArray;
-}
+    /**
+     * this method combines all data of words in one array to convert it to JSON
+     * @param array $uniqueWords - filtered word's id
+     * @return array of words and their properties, runes and equipment
+     */
+    private
+    function combineWordsData(array $uniqueWords)
+    {
+        $wordsArray = [];
+
+        foreach ($uniqueWords as $key => $wordId) {
+            $wordsArray[$this->wordsNames[$wordId]]['name'] = $this->wordsNames[$wordId];
+            $wordsArray[$this->wordsNames[$wordId]]['id'] = $wordId;
+            $wordsArray[$this->wordsNames[$wordId]]['properties'] = $this->wordsProperties[$wordId];
+            $wordsArray[$this->wordsNames[$wordId]]['equipment'] = $this->wordsEquip[$wordId];
+            $wordsArray[$this->wordsNames[$wordId]]['runes'] = $this->wordsRunes[$wordId];
+        }
+
+        return $wordsArray;
+    }
 
 }
