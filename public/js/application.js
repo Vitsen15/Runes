@@ -19,14 +19,18 @@ $(function () {
     function resetFilters() {
         var $resetFilters = $('#reset-filters');
         var $filters = $("input[name='runes[]'], [name='sockets[]'], [name='classes[]'], [name='equip_type[]']");
-        var levelFilters = $("input[name='maxLevel'], [name='minLevel']");
-        var levelsFiltersOutput = $("output[name='minLevelOutput'], [name='maxLevelOutput']");
+        var $maxLevelFilter = $("input[name='maxLevel']");
+        var $minLevelFilter = $("input[name='minLevel']");
+        var $maxLevelFilterOutput = $("output[name='maxLevelOutput']");
+        var $minLevelFilterOutput = $("output[name='minLevelOutput']");
 
 
         $resetFilters.click(function () {
             $filters.prop('checked', false);
-            levelFilters.val(false);
-            levelsFiltersOutput.val(false);
+            $maxLevelFilter.val($maxLevelFilter.prop('max'));
+            $minLevelFilter.val($maxLevelFilter.prop('min'));
+            $maxLevelFilterOutput.val($maxLevelFilter.prop('max'));
+            $minLevelFilterOutput.val($maxLevelFilter.prop('min'));
         });
     }
 
@@ -103,6 +107,7 @@ $(function () {
                     return;
                 }
                 console.log(data);
+                console.log(JSON.parse(data));
                 appendFoundWords(JSON.parse(data));
             });
     };
