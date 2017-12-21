@@ -4,7 +4,7 @@ DELIMITER //
 CREATE PROCEDURE selectWordsByRunes(IN  runes_id VARCHAR(255),
                                     OUT result   VARCHAR(255))
   BEGIN
-    DROP TABLE IF EXISTS AllWordsRunesCount, SelectedWordsRunesCount, SelectedWordsByRunes, resultTable, explode_table;
+    DROP TABLE IF EXISTS AllWordsRunesCount, SelectedWordsRunesCount, SelectedWordsByRunes;
 
     CREATE TEMPORARY TABLE AllWordsRunesCount (
       word_id    INT,
@@ -28,8 +28,6 @@ CREATE PROCEDURE selectWordsByRunes(IN  runes_id VARCHAR(255),
       rune_name VARCHAR(30)
     );
 
-    CALL explode_str(runes_id);
-
     INSERT INTO SelectedWordsByRunes (word_id, word_name, rune_id, rune_name)
       SELECT
         words.id   AS id_word,
@@ -42,9 +40,7 @@ CREATE PROCEDURE selectWordsByRunes(IN  runes_id VARCHAR(255),
              words.id
         INNER JOIN runes
           ON runes_order.rune_id = runes.id
-      WHERE runes.id IN
-            (SELECT exploded_values
-             FROM explode_table);
+      WHERE find_in_set(cast(runes.id AS CHAR), runes_id);
 
 
     CREATE TEMPORARY TABLE SelectedWordsRunesCount (
@@ -59,20 +55,13 @@ CREATE PROCEDURE selectWordsByRunes(IN  runes_id VARCHAR(255),
                                                     GROUP BY SelectedWordsByRunes.word_id
                                                     HAVING count(SelectedWordsByRunes.rune_id) > 1;
 
-    CREATE TEMPORARY TABLE resultTable (
-      id INT
-    );
+    SELECT group_concat(SelectedWordsRunesCount.id) AS word_id
+    FROM SelectedWordsRunesCount
+      INNER JOIN AllWordsRunesCount
+        ON AllWordsRunesCount.word_id = SelectedWordsRunesCount.id
+    WHERE AllWordsRunesCount.rune_count = SelectedWordsRunesCount.count
+    INTO result;
 
-    INSERT INTO resultTable (id) SELECT SelectedWordsRunesCount.id
-                                 FROM SelectedWordsRunesCount
-                                   INNER JOIN AllWordsRunesCount
-                                     ON AllWordsRunesCount.word_id = SelectedWordsRunesCount.id
-                                 WHERE AllWordsRunesCount.rune_count = SelectedWordsRunesCount.count;
-
-    SELECT group_concat(resultTable.id) AS word_id
-    INTO result
-    FROM resultTable;
-
-    DROP TABLE IF EXISTS AllWordsRunesCount, SelectedWordsRunesCount, SelectedWordsByRunes, resultTable, explode_table;
+    DROP TABLE IF EXISTS AllWordsRunesCount, SelectedWordsRunesCount, SelectedWordsByRunes;
   END//
 DELIMITER ;
