@@ -5,7 +5,7 @@ CREATE PROCEDURE selectWordsBySockets(IN  sockets        VARCHAR(255),
                                       OUT wordsBySockets VARCHAR(255))
   BEGIN
 
-    DROP TABLE IF EXISTS wordsRunesCount, explode_table;
+    DROP TABLE IF EXISTS wordsRunesCount;
 
     CREATE TEMPORARY TABLE wordsRunesCount (
       word_id        INT,
@@ -20,15 +20,12 @@ CREATE PROCEDURE selectWordsBySockets(IN  sockets        VARCHAR(255),
                                                               ON runes_order.runes_word_id = words.id
                                                           GROUP BY word_id;
 
-    CALL explode_str(sockets);
-
     SELECT group_concat(wordsRunesCount.word_id)
     INTO wordsBySockets
     FROM wordsRunesCount
-    WHERE wordsRunesCount.count_of_runes IN (SELECT exploded_values
-                                             FROM explode_table);
+    WHERE find_in_set(cast(wordsRunesCount.count_of_runes AS CHAR), sockets);
 
-    DROP TABLE IF EXISTS wordsRunesCount, explode_table;
+    DROP TABLE IF EXISTS wordsRunesCount;
   END//
 
 DELIMITER ;
