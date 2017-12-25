@@ -13,13 +13,6 @@ class WordsAjaxHandler extends Controller
     private $maxLevelFromClient;
     private $equipmentFromClient;
 
-    // Filtered words id
-    private $wordsIdByRunes;
-    private $wordsIdBySockets;
-    private $wordsIdByClasses;
-    private $wordsIdByLevels;
-    private $wordsIdByEquipment;
-
     // Combined words id by all filters
     private $uniqueWordsID;
 
@@ -37,8 +30,6 @@ class WordsAjaxHandler extends Controller
         $this->model = new RunesModel($this->db);
 
         $this->getClientFiltersData();
-
-        $this->getFiltersResults();
 
         $this->formResponseJSON();
     }
@@ -92,32 +83,11 @@ class WordsAjaxHandler extends Controller
             }
         }
 
-        if ($post['minLevel'] > $post['maxLevel']){
+        if ($post['minLevel'] > $post['maxLevel']) {
             return false;
         }
 
         return true;
-    }
-
-    /**
-     * Gets words id from DB by filters values from client
-     */
-    private function getFiltersResults()
-    {
-        $this->wordsIdByRunes = $this->runesFromClient ?
-            $this->model->filterWordsByRunes($this->runesFromClient) : null;
-
-        $this->wordsIdByClasses = $this->classesFromClient ?
-            $this->model->filterWordsByClasses($this->classesFromClient) : null;
-
-        $this->wordsIdBySockets = $this->socketsFromClient ?
-            $this->model->filterWordsBySockets($this->socketsFromClient) : null;
-
-        $this->wordsIdByLevels = ($this->minLevelFromClient && $this->maxLevelFromClient) ?
-            $this->model->filterWordsByLevels($this->minLevelFromClient, $this->maxLevelFromClient) : null;
-
-        $this->wordsIdByEquipment = $this->equipmentFromClient ?
-            $this->model->filterWordsByEquipment($this->equipmentFromClient) : null;
     }
 
     /**
@@ -141,9 +111,9 @@ class WordsAjaxHandler extends Controller
      */
     private function collectDataForResponse()
     {
-        $this->uniqueWordsID = $this->selectUniqueWordsIDFromFilters();
+        $this->uniqueWordsID = $this->filterWords();
 
-        if (!$this->uniqueWordsID) {
+        if ($this->uniqueWordsID === ['']) {
             return false;
         } else {
             asort($this->uniqueWordsID);
@@ -163,38 +133,33 @@ class WordsAjaxHandler extends Controller
     /**
      * @return mixed array of unique id's of filtered words or false if not any filtered words id's
      */
-    private function selectUniqueWordsIDFromFilters()
+    private function filterWords()
     {
-        $filtersData = [];
+        $filtersData = new stdClass();
 
-        if (isset($this->wordsIdByLevels->words)) {
-            $filtersData[] = explode(',', $this->wordsIdByLevels->words);
-        }
+        $filtersData->{'runes'} = isset($this->runesFromClient) ?
+            implode(',', $this->runesFromClient) : '';
 
-        if (isset($this->wordsIdByRunes->words)) {
-            $filtersData[] = explode(',', $this->wordsIdByRunes->words);
-        }
+        $filtersData->{'sockets'} = isset($this->socketsFromClient) ?
+            implode(',', $this->socketsFromClient) : '';
 
-        if (isset($this->wordsIdBySockets->words)) {
-            $filtersData[] = explode(',', $this->wordsIdBySockets->words);
-        }
+        $filtersData->{'classes'} = isset($this->classesFromClient) ?
+            implode(',', $this->classesFromClient) : '';
 
-        if (isset($this->wordsIdByClasses->words)) {
-            $filtersData[] = explode(',', $this->wordsIdByClasses->words);
-        }
+        $filtersData->{'minLevel'} = isset($this->minLevelFromClient) ?
+            $this->minLevelFromClient : '';
 
-        if (isset($this->wordsIdByEquipment->words)) {
-            $filtersData[] = explode(',', $this->wordsIdByEquipment->words);
-        }
+        $filtersData->{'maxLevel'} = isset($this->maxLevelFromClient) ?
+            $this->maxLevelFromClient : '';
 
-        if (count($filtersData) === 1) {
-            return $filtersData[0];
-        } elseif (count($filtersData) === 0) {
-            return false;
-        } else {
-            $uniqueWords = array_intersect(...$filtersData);
-            return $uniqueWords;
-        }
+        $filtersData->{'equipment'} = isset($this->equipmentFromClient) ?
+            implode(',', $this->equipmentFromClient) : '';
+
+        $uniqueWords = $this->model->combineFilters($filtersData);
+
+        $uniqueWords = explode(',', $uniqueWords->words);
+
+        return $uniqueWords;
     }
 
     /**
