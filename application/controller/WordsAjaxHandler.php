@@ -207,7 +207,7 @@ class WordsAjaxHandler extends Controller
                         $propertyStr .= $property->min;
                     } else {
 
-                        $propertyStr .= $property->min . ' - ' . $property->max;
+                        $propertyStr .= "($property->min - $property->max)";
                     }
 
                     if ($property->value_type == '%') {
@@ -215,7 +215,13 @@ class WordsAjaxHandler extends Controller
                         $propertyStr .= $property->value_type . ' ';
                     }
 
-                    $wordProperties[] = $propertyStr . " {$property->name}";
+                    $propertyStr .= " {$property->name}";
+
+                    if($property->duration){
+                        $propertyStr .= " $property->duration с.";
+                    }
+
+                    $wordProperties[] = $propertyStr;
                 }
             }
 
