@@ -20,7 +20,7 @@
                         <td><input type="checkbox" value="<?php echo $rune->id; ?>" name="runes[]"></td>
 
                         <td>
-                            <img src="<?php echo $rune->img_url; ?>" alt="<?php echo $rune->name; ?>">
+                            <img src="<?php echo '/runes/' . $rune->img_url; ?>" alt="<?php echo $rune->name; ?>">
                         </td>
 
                         <td>
