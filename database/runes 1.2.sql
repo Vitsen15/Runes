@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Янв 01 2018 г., 19:44
+-- Время создания: Янв 05 2018 г., 23:17
 -- Версия сервера: 10.1.25-MariaDB
 -- Версия PHP: 7.1.7
 
@@ -26,7 +26,7 @@ DELIMITER $$
 --
 -- Процедуры
 --
-CREATE DEFINER=`root`@`%` PROCEDURE `intersectFilters` (IN `runes` VARCHAR(255) COLLATE utf8_general_ci, IN `sockets` VARCHAR(255) COLLATE utf8_general_ci, IN `classes` VARCHAR(255) COLLATE utf8_general_ci, IN `min_level` VARCHAR(255) COLLATE utf8_general_ci, IN `max_level` VARCHAR(255) COLLATE utf8_general_ci, IN `equipment` VARCHAR(255) COLLATE utf8_general_ci, OUT `result` VARCHAR(255))  BEGIN
+CREATE DEFINER=`root`@`%` PROCEDURE `intersectFilters` (IN `runes` VARCHAR(255), IN `sockets` VARCHAR(255), IN `classes` VARCHAR(255), IN `min_level` VARCHAR(255), IN `max_level` VARCHAR(255), IN `equipment` VARCHAR(255), OUT `result` VARCHAR(255))  BEGIN
 
     CALL selectWordsByRunes(runes, @Runes);
 
@@ -500,39 +500,39 @@ CREATE TABLE `runes` (
 --
 
 INSERT INTO `runes` (`id`, `name`, `img_url`, `lvl`) VALUES
-(1, 'El', 'img/runes/El.gif', 11),
-(2, 'Eld', 'img/runes/Eld.gif', 11),
-(3, 'Tir', 'img/runes/Tir.gif', 13),
-(4, 'Nef', 'img/runes/Nef.gif', 13),
-(5, 'Eth', 'img/runes/Eth.gif', 15),
-(6, 'Ith', 'img/runes/Ith.gif', 15),
-(7, 'Tal', 'img/runes/Tal.gif', 17),
-(8, 'Ral', 'img/runes/Ral.gif', 19),
-(9, 'Ort', 'img/runes/Ort.gif', 21),
-(10, 'Thul', 'img/runes/Thul.gif', 23),
-(11, 'Amn', 'img/runes/Amn.gif', 25),
-(12, 'Sol', 'img/runes/Sol.gif', 27),
-(13, 'Shael', 'img/runes/Shael.gif', 29),
-(14, 'Dol', 'img/runes/Dol.gif', 31),
-(15, 'Hel', 'img/runes/Hel.gif', 33),
-(16, 'Io', 'img/runes/Io.gif', 35),
-(17, 'Lum', 'img/runes/Lum.gif', 37),
-(18, 'Ko', 'img/runes/Ko.gif', 39),
-(19, 'Fal', 'img/runes/Fal.gif', 41),
-(20, 'Lem', 'img/runes/Lem.gif', 43),
-(21, 'Pul', 'img/runes/Pul.gif', 45),
-(22, 'Um', 'img/runes/Um.gif', 47),
-(23, 'Mal', 'img/runes/Mal.gif', 49),
-(24, 'Ist', 'img/runes/Ist.gif', 51),
-(25, 'Gul', 'img/runes/Gul.gif', 53),
-(26, 'Vex', 'img/runes/Vex.gif', 55),
-(27, 'Ohm', 'img/runes/Ohm.gif', 57),
-(28, 'Lo', 'img/runes/Lo.gif', 59),
-(29, 'Sur', 'img/runes/Sur.gif', 61),
-(30, 'Ber', 'img/runes/Ber.gif', 63),
-(31, 'Jah', 'img/runes/Jah.gif', 65),
-(32, 'Cham', 'img/runes/Cham.gif', 67),
-(33, 'Zod', 'img/runes/Zod.gif', 69);
+(1, 'El', 'img/runes/El', 11),
+(2, 'Eld', 'img/runes/Eld', 11),
+(3, 'Tir', 'img/runes/Tir', 13),
+(4, 'Nef', 'img/runes/Nef', 13),
+(5, 'Eth', 'img/runes/Eth', 15),
+(6, 'Ith', 'img/runes/Ith', 15),
+(7, 'Tal', 'img/runes/Tal', 17),
+(8, 'Ral', 'img/runes/Ral', 19),
+(9, 'Ort', 'img/runes/Ort', 21),
+(10, 'Thul', 'img/runes/Thul', 23),
+(11, 'Amn', 'img/runes/Amn', 25),
+(12, 'Sol', 'img/runes/Sol', 27),
+(13, 'Shael', 'img/runes/Shael', 29),
+(14, 'Dol', 'img/runes/Dol', 31),
+(15, 'Hel', 'img/runes/Hel', 33),
+(16, 'Io', 'img/runes/Io', 35),
+(17, 'Lum', 'img/runes/Lum', 37),
+(18, 'Ko', 'img/runes/Ko', 39),
+(19, 'Fal', 'img/runes/Fal', 41),
+(20, 'Lem', 'img/runes/Lem', 43),
+(21, 'Pul', 'img/runes/Pul', 45),
+(22, 'Um', 'img/runes/Um', 47),
+(23, 'Mal', 'img/runes/Mal', 49),
+(24, 'Ist', 'img/runes/Ist', 51),
+(25, 'Gul', 'img/runes/Gul', 53),
+(26, 'Vex', 'img/runes/Vex', 55),
+(27, 'Ohm', 'img/runes/Ohm', 57),
+(28, 'Lo', 'img/runes/Lo', 59),
+(29, 'Sur', 'img/runes/Sur', 61),
+(30, 'Ber', 'img/runes/Ber', 63),
+(31, 'Jah', 'img/runes/Jah', 65),
+(32, 'Cham', 'img/runes/Cham', 67),
+(33, 'Zod', 'img/runes/Zod', 69);
 
 -- --------------------------------------------------------
 
