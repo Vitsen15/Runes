@@ -16,7 +16,3 @@
     <link href="<?php echo URL; ?>css/main.css" rel="stylesheet">
 </head>
 <body>
-<!-- logo -->
-<div class="logo">
-    Runes
-</div>

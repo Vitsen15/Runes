@@ -1,0 +1,30 @@
+.accordion {
+  box-sizing: border-box;
+  overflow:hidden;
+  border-radius:3px;
+
+  .accordion-section-title {
+    width: 100%;
+    padding: 15px;
+    border-bottom: 1px solid #1a1a1a;
+    transition: all linear 0.15s;
+    /* Type */
+    font-size: 1.200em;
+
+    .active &:hover {
+      background: #4c4c4c;
+      /* Type */
+      text-decoration: none;
+    }
+  }
+
+  .accordion-section:last-child .accordion-section-title {
+    border-bottom: none;
+  }
+
+  /*----- Section Content -----*/
+  .accordion-section-content {
+    padding: 15px;
+    display: none;
+  }
+}

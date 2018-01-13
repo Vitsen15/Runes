@@ -1,119 +1,110 @@
 <div class="container">
-    <h2>Выберите параметры что бы получить нужные рунные слова(о)</h2>
-    <form action="" name="runes-form">
-        <h2>Выберите руны</h2>
-        <div class="runes">
-            <div class="runes__items-heading">
-                <div>Checked</div>
-                <div>Вид</div>
-                <div>Название</div>
-                <div>Уровень</div>
-                <div>Свойство в оружии</div>
-                <div>Свойство в броне</div>
+    <form action="" name="runes-form" class="accordion">
+        <div class="runes accordion-section">
+            <a class="accordion-section-title" href="#runes-accordion">Выберите руны</a>
+            <div id="runes-accordion" class="runes__items-container accordion-section-content">
+                <?php $counter = 0; ?>
+                <?php $difficulty = 11; ?>
+                <div class="normal-difficulty-runes">
+                    <?php include APP . 'view/_templates/single_rune_layout.php'; ?>
+                    <?php $counter += 11; ?>
+                    <?php $difficulty += 11; ?>
+                </div>
+
+                <div class="hell-difficulty-runes">
+                    <?php include APP . 'view/_templates/single_rune_layout.php'; ?>
+                    <?php $counter += 11; ?>
+                    <?php $difficulty += 11; ?>
+                </div>
+
+                <div class="nightmare-difficulty-runes">
+                    <?php include APP . 'view/_templates/single_rune_layout.php'; ?>
+                    <?php unset($counter); ?>
+                    <?php unset($difficulty); ?>
+                </div>
             </div>
-            <div class="runes__items-container">
-                <?php foreach ($this->runesController->runesWithProperties as $rune): ?>
-                    <div class="runes__item">
+        </div>
 
-                        <input type="checkbox" value="<?php echo $rune->id; ?>" id="<?php echo $rune->name; ?>" name="runes[]">
+        <div class="filer accordion-section">
+            <a class="accordion-section-title" href="#sockets-accordion">Выберите количество сокетов</a>
+            <div id="sockets-accordion" class="accordion-section-content">
+                <label for="2">2</label>
+                <input type="checkbox" id="2" value="2" name="sockets[]">
 
-                        <label class="runes__item-image" for="<?php echo $rune->name; ?>">
-                            <img src="<?php echo '/runes/' . $rune->img_url . '.png'; ?>" alt="<?php echo $rune->name; ?>">
-                        </label>
+                <br>
 
-                        <div class="runes__item-name">
-                            <?php echo $rune->name; ?>
-                        </div>
+                <label for="3">3</label>
+                <input type="checkbox" id="3" value="3" name="sockets[]">
 
-                        <div class="runes__item-lvl"><?php echo $rune->lvl; ?></div>
-                        <div class="runes__item-weapon-property">
-                            <?php foreach ($rune->properties->in_weapon as $key => $weaponProp): ?>
-                                <?php if (count($rune->properties->in_weapon) - 1 == $key): ?>
-                                    <?php echo $weaponProp; ?>
-                                    <?php break; ?>
-                                <?php else: ?>
-                                    <?php echo $weaponProp; ?>
-                                    <?php echo ', '; ?>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                        </div>
+                <br>
 
-                        <div class="runes__item-armour-property">
-                            <?php foreach ($rune->properties->in_armour as $key => $armourProp): ?>
-                                <?php if (count($rune->properties->in_armour) - 1 == $key): ?>
-                                    <?php echo $armourProp; ?>
-                                    <?php break; ?>
-                                <?php else: ?>
-                                    <?php echo $armourProp; ?>
-                                    <?php echo ', '; ?>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
+                <label for="4">4</label>
+                <input type="checkbox" id="4" value="4" name="sockets[]">
+
+                <br>
+
+                <label for="5">5</label>
+                <input type="checkbox" id="5" value="5" name="sockets[]">
+
+                <br>
+
+                <label for="6">6</label>
+                <input type="checkbox" id="6" value="6" name="sockets[]">
+            </div>
+        </div>
+
+        <div class="filer accordion-section">
+            <a class="accordion-section-title" href="#classes-accordion">Выберите класс</a>
+
+            <div id="classes-accordion" class="accordion-section-content">
+                <?php foreach ($this->classesController->classes as $class): ?>
+                    <label for="<?php echo $class->name; ?>"><?php echo $class->name; ?></label>
+                    <input type="checkbox" id="<?php echo $class->name; ?>" name="classes[]"
+                           value="<?php echo $class->id; ?>">
+                    <br>
                 <?php endforeach; ?>
             </div>
         </div>
 
-        <h2>Выберите количество сокетов</h2>
-        <label for="2">2</label>
-        <input type="checkbox" id="2" value="2" name="sockets[]">
+        <div class="filer accordion-section">
+            <a href="#levels-accordion" class="accordion-section-title">Выберите уровень</a>
+            <div id="levels-accordion" class="accordion-section-content">
+                <h2>Минимальный уровень</h2>
+                <input type="range" name="minLevel" list="min-levels-list"
+                       min="<?php echo $this->levelsController->levels[0]; ?>"
+                       max="<?php echo end($this->levelsController->levels); ?>"
+                       value="<?php echo $this->levelsController->levels[0]; ?>"
+                       oninput="minLevelOutput.value = minLevel.value">
+                <output name="minLevelOutput"><?php echo $this->levelsController->levels[0]; ?></output>
+                <datalist id="min-levels-list">
+                    <?php foreach ($this->levelsController->levels as $level): ?>
+                    <option value="<?php echo $level; ?>">
+                        <?php endforeach; ?>
+                </datalist>
 
-        <label for="3">3</label>
-        <input type="checkbox" id="3" value="3" name="sockets[]">
-
-        <label for="4">4</label>
-        <input type="checkbox" id="4" value="4" name="sockets[]">
-
-        <label for="5">5</label>
-        <input type="checkbox" id="5" value="5" name="sockets[]">
-
-        <label for="6">6</label>
-        <input type="checkbox" id="6" value="6" name="sockets[]">
-
-        <h2>Выберите класс</h2>
-
-        <?php foreach ($this->classesController->classes as $class): ?>
-            <label for="<?php echo $class->name; ?>"><?php echo $class->name; ?></label>
-            <input type="checkbox" id="<?php echo $class->name; ?>" name="classes[]"
-                   value="<?php echo $class->id; ?>">
-            <br>
-        <?php endforeach; ?>
-
-
-        <h2>Выберите уровень</h2>
-        <div>
-            <h2>Минимальный уровень</h2>
-            <input type="range" name="minLevel" list="min-levels-list"
-                   min="<?php echo $this->levelsController->levels[0]; ?>"
-                   max="<?php echo end($this->levelsController->levels); ?>"
-                   value="<?php echo $this->levelsController->levels[0]; ?>"
-                   oninput="minLevelOutput.value = minLevel.value">
-            <output name="minLevelOutput"><?php echo $this->levelsController->levels[0]; ?></output>
-            <datalist id="min-levels-list">
-                <?php foreach ($this->levelsController->levels as $level): ?>
-                <option value="<?php echo $level; ?>">
-                    <?php endforeach; ?>
-            </datalist>
-        </div>
-        <div>
-            <h2>Максимальный уровень</h2>
-            <input type="range" name="maxLevel" list="min-levels-list"
-                   min="<?php echo $this->levelsController->levels[0]; ?>"
-                   max="<?php echo end($this->levelsController->levels); ?>"
-                   value="<?php echo end($this->levelsController->levels); ?>"
-                   oninput="maxLevelOutput.value = maxLevel.value">
-            <output name="maxLevelOutput"><?php echo end($this->levelsController->levels); ?></output>
-            <datalist id="min-levels-list">
-                <?php foreach ($this->levelsController->levels as $level): ?>
-                <option value="<?php echo $level; ?>">
-                    <?php endforeach; ?>
-            </datalist>
+                <h2>Максимальный уровень</h2>
+                <input type="range" name="maxLevel" list="min-levels-list"
+                       min="<?php echo $this->levelsController->levels[0]; ?>"
+                       max="<?php echo end($this->levelsController->levels); ?>"
+                       value="<?php echo end($this->levelsController->levels); ?>"
+                       oninput="maxLevelOutput.value = maxLevel.value">
+                <output name="maxLevelOutput"><?php echo end($this->levelsController->levels); ?></output>
+                <datalist id="min-levels-list">
+                    <?php foreach ($this->levelsController->levels as $level): ?>
+                    <option value="<?php echo $level; ?>">
+                        <?php endforeach; ?>
+                </datalist>
+            </div>
         </div>
 
-        <h2>Выберите тип снаряжения</h2>
-        <ul id="equip-tree">
-            <?php $this->equipmentController->renderAllEquipment($this->equipmentController->equipment); ?>
-        </ul>
+        <div class="filer accordion-section">
+            <a href="#equipment-accordion" class="accordion-section-title">Выберите тип снаряжения</a>
+            <div id="equipment-accordion" class="accordion-section-content">
+                <ul id="equip-tree">
+                    <?php $this->equipmentController->renderAllEquipment($this->equipmentController->equipment); ?>
+                </ul>
+            </div>
+        </div>
 
         <button type="submit" onclick="sendFilterData()">Найти</button>
         <button id="reset-filters">Сбросить фильтры</button>

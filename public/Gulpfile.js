@@ -26,13 +26,13 @@ gulp.task('watch', function () {
 	watch(['stylesheets/**/*.scss'], function (event, cb) {
 		gulp.start('stylesheets');
 	});
-	watch(['./js/application.js'], function (event, cb) {
+	watch(['./js/*.js'], function (event, cb) {
 		gulp.start('uglify');
 	});
 });
 
 gulp.task('uglify', function () {
-	gulp.src('./js/application.js')
+	gulp.src('./js/*.js')
 		.pipe(babel({
 			presets: ['es2015']
 		}))
