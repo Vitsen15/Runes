@@ -9,6 +9,7 @@ $(document).ready(function () {
 	$('.accordion-section-title').click(function (e) {
 		// Grab current anchor value
 		var currentAttrValue = $(this).attr('href');
+		var currentSection = $('.accordion ' + currentAttrValue);
 
 		if ($(e.target).is('.active')) {
 			close_accordion_section();
@@ -17,7 +18,8 @@ $(document).ready(function () {
 			// Add active class to section title
 			$(this).addClass('active');
 			// Open up the hidden content panel
-			$('.accordion ' + currentAttrValue).slideDown(300).addClass('open');
+			currentSection.slideDown(300).addClass('open');
+			currentSection.css('display', 'flex');
 		}
 
 		e.preventDefault();
