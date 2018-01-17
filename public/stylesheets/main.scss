@@ -1,8 +1,8 @@
 @import "base/normalize";
 @import "mixins/breakpoint";
 @import "base/base";
-@import "blocks/runes";
-@import "blocks/sockets";
-@import "blocks/levels";
+@import "modificators/runes-filter";
+@import "modificators/sockets-filter";
+@import "modificators/levels-filter";
 @import "blocks/filter";
 @import "modificators/accordion";
