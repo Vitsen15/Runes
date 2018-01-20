@@ -19,7 +19,8 @@
     "gulp-autoprefixer": "^3.1.1",
     "gulp-babel": "^7.0.0",
     "gulp-sass": "^2.3.1",
-    "gulp-uglifyjs": "^0.6.2",
+    "gulp-sourcemaps": "^2.6.3",
+    "gulp-uglify-es": "^1.0.0",
     "gulp-wait": "0.0.2",
     "gulp-wait2": "0.0.5",
     "gulp-watch": "^4.3.9"
