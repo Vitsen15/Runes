@@ -1,12 +1,14 @@
+/* eslint-disable no-undef */
 'use strict';
 
-var gulp = require('gulp'),
+let gulp = require('gulp'),
 	autoprefixer = require('gulp-autoprefixer'),
 	sass = require('gulp-sass'),
 	watch = require('gulp-watch'),
 	wait = require('gulp-wait'),
-	uglify = require('gulp-uglifyjs'),
-	babel = require('gulp-babel');
+	uglify = require('gulp-uglify-es').default,
+	babel = require('gulp-babel'),
+	sourcemaps = require('gulp-sourcemaps');
 
 
 // Scss stylesheets
@@ -22,32 +24,29 @@ gulp.task('stylesheets', function () {
 		.pipe(gulp.dest('css/'));
 });
 
-gulp.task('watch', function () {
-	watch(['stylesheets/**/*.scss'], function (event, cb) {
-		gulp.start('stylesheets');
-	});
-	watch(['./js/*.js'], function (event, cb) {
-		gulp.start('uglify');
-	});
-});
-
-gulp.task('uglify', function () {
-	gulp.src('./js/*.js')
+gulp.task('javascript', function () {
+	gulp.src('./js/src/*.js')
+		.pipe(sourcemaps.init())
 		.pipe(babel({
 			presets: ['es2015']
 		}))
 		.pipe(uglify())
+		.pipe(sourcemaps.write())
 		.pipe(gulp.dest('./js/min'));
+});
+
+gulp.task('watch', function () {
+	watch(['stylesheets/**/*.scss'], function (event, cb) {
+		gulp.start('stylesheets');
+	});
+	watch(['./js/src/*.js'], function (event, cb) {
+		gulp.start('javascript');
+	});
 });
 
 // Run
 gulp.task('default', [
 	'stylesheets',
-	'uglify',
-	'watch'
-]);
-
-gulp.task('wp', [
-	'stylesheets',
+	'javascript',
 	'watch'
 ]);
