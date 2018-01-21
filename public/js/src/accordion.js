@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-$(document).ready(() => {
+$(document).ready(function () {
 	function close_accordion_section($target) {
 		// let $accordionContent = $('.accordion .accordion-section-content');
 
@@ -12,7 +12,7 @@ $(document).ready(() => {
 		let currentAttrValue = $(this).attr('href');
 		let currentSection = $(currentAttrValue);
 
-		if ($(e.target).is('.active')){
+		if ($(e.target).is('.active')) {
 			close_accordion_section($(e.target).parent().find('.accordion-section-content'));
 		} else {
 			// Add active class to section title

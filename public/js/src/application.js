@@ -1,7 +1,7 @@
 /* eslint-disable no-console,no-undef */
 'use strict';
 
-$(document).ready(() => {
+$(document).ready(function () {
 	formSubmitPreventDefault();
 	levelFiltersValidation();
 	equipmentSelectionHandler();
@@ -24,7 +24,7 @@ function resetFilters() {
 	let $minLevelFilterOutput = $('output[name=\'minLevelOutput\']');
 
 
-	$resetFilters.click(() => {
+	$resetFilters.click(function () {
 		$filters.prop('checked', false);
 		$maxLevelFilter.val($maxLevelFilter.prop('max'));
 		$minLevelFilter.val($maxLevelFilter.prop('min'));
@@ -37,7 +37,7 @@ function resetWords() {
 	let $resetWordsButton = $('#reset-words');
 	let $wordsWrapper = $('#words-wrapper');
 
-	$resetWordsButton.click(() => {
+	$resetWordsButton.click(function () {
 		$wordsWrapper.empty();
 	});
 }
@@ -55,9 +55,9 @@ function levelFiltersValidation() {
 	function setMinLevelLimiter() {
 		let previousMinLevel = $minLevelOutput.val();
 
-		$minLevelInput.click(() => {
+		$minLevelInput.click(function () {
 			previousMinLevel = this.value;
-		}).change(() => {
+		}).change(function () {
 			if (this.value > $maxLevelInput.val()) {
 				$(this).val(previousMinLevel);
 				$minLevelOutput.val(this.value);
@@ -69,9 +69,9 @@ function levelFiltersValidation() {
 	function setMaxLevelLimiter() {
 		let previousMaxLevel = $maxLevelInput.val();
 
-		$maxLevelInput.click(() => {
+		$maxLevelInput.click(function () {
 			previousMaxLevel = this.value;
-		}).change(() => {
+		}).change(function () {
 			if (this.value < $minLevelInput.val()) {
 				$(this).val(previousMaxLevel);
 				$maxLevelOutput.val(this.value);
@@ -82,12 +82,14 @@ function levelFiltersValidation() {
 }
 
 function equipmentSelectionHandler() {
-	let $equipment = $('.equip-tree').find('li');
+	let $equipment = $('.equip-tree').find('li input[type=checkbox]');
 
-	$equipment.on('click', 'input[type=checkbox]', () => {
-		$(this).parent().parents('li').children('[type=checkbox]').prop({'indeterminate': true, 'checked': false});
-		let $children = $(this).parent().find('li [type=checkbox]');
+	$equipment.on('click', function () {
+		$(this).parent().parents('li').children('input[type=checkbox]').prop({'indeterminate': true, 'checked': false});
+
+		let $children = $(this).parent().find('li input[type=checkbox]');
 		let checkedState = $(this).prop('checked');
+
 		$children.prop('checked', checkedState);
 	});
 }
